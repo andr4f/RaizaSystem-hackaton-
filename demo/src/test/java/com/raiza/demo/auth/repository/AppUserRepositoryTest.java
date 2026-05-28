@@ -2,6 +2,7 @@ package com.raiza.demo.auth.repository;
 
 import com.raiza.demo.auth.entity.AppUser;
 import com.raiza.demo.shared.AbstractRepositoryTest;
+import com.raiza.demo.shared.enums.UserRole;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -21,7 +22,7 @@ class AppUserRepositoryTest extends AbstractRepositoryTest {
         assertThat(user).isPresent();
         assertThat(user.get().getName()).isEqualTo("Admin Magdalena");
         assertThat(user.get().getEmail()).isEqualTo("admin@magdalena.co");
-        assertThat(user.get().getRole()).isEqualTo("ADMIN");
+        assertThat(user.get().getRole()).isEqualTo(UserRole.ADMIN);
         assertThat(user.get().isActive()).isTrue();
     }
 
@@ -52,7 +53,7 @@ class AppUserRepositoryTest extends AbstractRepositoryTest {
         user.setName("Test User");
         user.setEmail("test@magdalena.co");
         user.setPassword("password123");
-        user.setRole("OPERATOR");
+        user.setRole(UserRole.TOURISM_OPERATOR);
         user.setActive(true);
 
         AppUser saved = appUserRepository.save(user);

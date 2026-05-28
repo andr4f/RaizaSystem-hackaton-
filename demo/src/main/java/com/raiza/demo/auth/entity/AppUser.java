@@ -1,6 +1,7 @@
 package com.raiza.demo.auth.entity;
 
 import com.raiza.demo.shared.BaseEntity;
+import com.raiza.demo.shared.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,9 +23,13 @@ public class AppUser extends BaseEntity {
     @Column(nullable = false)
     private String password;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
-    private String role;
+    private UserRole role;
 
     @Column(nullable = false)
     private boolean active = true;
+
+    @Column(name = "onboarding_completed", nullable = false)
+    private boolean onboardingCompleted = false;
 }

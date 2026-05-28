@@ -98,7 +98,7 @@ public class ProductLotService {
         lot.setProcessType(request.processType());
         lot.setCultivationConditions(request.cultivationConditions());
         lot.setQualityGrade(request.qualityGrade());
-        lot.setStatus(LotStatus.AVAILABLE);
+        lot.setStatus(LotStatus.CERTIFICATION_PENDING);
         lot.setQrCodeValue("qr-" + UUID.randomUUID().toString().replace("-", "").substring(0, 16));
 
         ProductLot saved = productLotRepository.save(lot);
