@@ -9,9 +9,19 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - "5432:5432"
+      - "5434:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+  postgres-test:
+    image: postgres:15-alpine
+    container_name: magdalena_trace_test_db
+    environment:
+      POSTGRES_DB: magdalena_trace_test
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5435:5432"
 
 volumes:
   postgres_data:

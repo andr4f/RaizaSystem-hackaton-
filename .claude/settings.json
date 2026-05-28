@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./mvnw -q dependency:build-classpath -Dmdep.outputFile=/tmp/cp.txt)",
+      "Read(//c/Users/cerpa/.m2/repository/org/springframework/boot/spring-boot-data-jpa-test/4.0.6/**)",
+      "Bash(xargs jar tf)",
+      "Bash(find ~/.m2/repository/org/springframework/boot/spring-boot-jdbc-test/4.0.6/ -name \"*.jar\" | head -1 | xargs jar tf 2>/dev/null | grep -i \"AutoConfigureTestDatabase\" | head -5)",
+      "Read(//c/Users/cerpa/.m2/repository/org/springframework/boot/spring-boot-jdbc-test/4.0.6/**)",
+      "Bash(./mvnw -q -DskipTests clean compile)"
+    ]
+  }
+}
