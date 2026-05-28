@@ -109,9 +109,10 @@ public class PublicTraceService {
     }
 
     private PublicCertificationItem toCertificationItem(LotCertification link) {
+        var cert = link.getCertification();
         return new PublicCertificationItem(
-                link.getCertification().getName(),
-                link.getCertification().getIssuer(),
+                cert.getName(),
+                cert.getCertifier().toString(),
                 link.getCertificateCode(),
                 link.getStatus(),
                 link.getValidFrom(),
