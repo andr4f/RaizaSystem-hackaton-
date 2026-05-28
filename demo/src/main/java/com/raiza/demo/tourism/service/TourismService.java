@@ -53,6 +53,13 @@ public class TourismService {
     }
 
     @Transactional(readOnly = true)
+    public List<ExperienceResponse> findAllExperiences() {
+        return tourismExperienceRepository.findAll().stream()
+                .map(tourismMapper::toResponse)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public ExperienceResponse findExperienceById(Long id) {
         return tourismMapper.toResponse(getExperienceOrThrow(id));
     }

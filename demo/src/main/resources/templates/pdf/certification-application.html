@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8"/>
+    <style>
+        body { font-family: Arial, sans-serif; font-size: 12px; color: #1a1a1a; margin: 40px; }
+        h1   { font-size: 20px; color: #2d6a4f; border-bottom: 2px solid #2d6a4f; padding-bottom: 6px; }
+        h2   { font-size: 14px; color: #2d6a4f; margin-top: 24px; margin-bottom: 6px; }
+        .header  { display: flex; justify-content: space-between; margin-bottom: 24px; }
+        .code    { font-size: 11px; color: #666; }
+        .section { margin-bottom: 16px; }
+        table    { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+        td       { padding: 5px 8px; border: 1px solid #dee2e6; vertical-align: top; }
+        td.label { background: #f1f8f4; font-weight: bold; width: 40%; }
+        .badge   { background: #2d6a4f; color: #fff; padding: 2px 8px;
+                   border-radius: 4px; font-size: 11px; }
+        .answers table td { font-size: 11px; }
+        .compliant-yes { color: #2d6a4f; font-weight: bold; }
+        .compliant-no  { color: #c0392b; font-weight: bold; }
+        .missing ul { margin: 4px 0 0 16px; font-size: 11px; color: #c0392b; }
+        .footer  { margin-top: 32px; font-size: 10px; color: #999; border-top: 1px solid #dee2e6;
+                   padding-top: 8px; text-align: center; }
+    </style>
+</head>
+<body>
+
+<!-- Encabezado -->
+<div class="header">
+    <div>
+        <h1>Solicitud de Certificación</h1>
+        <p class="code">Código: <strong th:text="${payload.applicationCode}">APP-001</strong></p>
+        <p class="code">Generado: <span th:text="${payload.generatedAt}">2026-01-01</span></p>
+    </div>
+    <div>
+        <span class="badge" th:text="${payload.certificationName}">Fairtrade</span>
+        <p class="code" th:if="${payload.recommendedByAi}">✓ Recomendado por asistente IA</p>
+    </div>
+</div>
+
+<!-- 1. Datos del Productor -->
+<h2>1. Datos del Productor</h2>
+<table>
+    <tr><td class="label">Nombre</td><td th:text="${payload.producerName}">—</td></tr>
+    <tr><td class="label">Tipo documento</td><td th:text="${payload.documentType}">—</td></tr>
+    <tr><td class="label">Número documento</td><td th:text="${payload.documentNumber}">—</td></tr>
+    <tr><td class="label">Tipo productor</td><td th:text="${payload.producerType}">—</td></tr>
+    <tr><td class="label">Municipio</td><td th:text="${payload.municipality + ', ' + payload.department}">—</td></tr>
+    <tr><td class="label">Comunidad</td><td th:text="${payload.communityName}">—</td></tr>
+    <tr><td class="label">Teléfono</td><td th:text="${payload.phone}">—</td></tr>
+    <tr><td class="label">Email</td><td th:text="${payload.email}">—</td></tr>
+    <tr th:if="${payload.isCooperativeMember}">
+        <td class="label">Asociación</td>
+        <td th:text="${payload.associationName}">—</td>
+    </tr>
+</table>
+
+<!-- 2. Datos de la Finca -->
+<h2>2. Datos de la Finca</h2>
+<table>
+    <tr><td class="label">Nombre finca</td><td th:text="${payload.farmName}">—</td></tr>
+    <tr><td class="label">Municipio</td><td th:text="${payload.farmMunicipality}">—</td></tr>
+    <tr><td class="label">Corregimiento</td><td th:text="${payload.corregimiento}">—</td></tr>
+    <tr><td class="label">Altitud (msnm)</td><td th:text="${payload.altitudeMeters}">—</td></tr>
+    <tr><td class="label">Área (ha)</td><td th:text="${payload.areaHectares}">—</td></tr>
+    <tr><td class="label">Coordenadas</td>
+        <td th:text="${payload.latitude + ', ' + payload.longitude}">—</td></tr>
+    <tr><td class="label">Conectividad</td><td th:text="${payload.connectivityLevel}">—</td></tr>
+</table>
+
+<!-- 3. Datos Productivos -->
+<h2>3. Datos Productivos del Lote</h2>
+<table>
+    <tr><td class="label">Código lote</td><td th:text="${payload.lotCode}">—</td></tr>
+    <tr><td class="label">Producto</td><td th:text="${payload.productName + ' (' + payload.productCategory + ')'}">—</td></tr>
+    <tr><td class="label">Fecha cosecha</td><td th:text="${payload.harvestDate}">—</td></tr>
+    <tr><td class="label">Volumen estimado</td>
+        <td th:text="${payload.estimatedVolume + ' ' + payload.volumeUnit}">—</td></tr>
+    <tr><td class="label">Tipo cultivo</td><td th:text="${payload.cultivationType}">—</td></tr>
+    <tr><td class="label">Tipo proceso</td><td th:text="${payload.processType}">—</td></tr>
+    <tr><td class="label">Grado calidad</td><td th:text="${payload.qualityGrade}">—</td></tr>
+    <tr><td class="label">Condiciones cultivo</td><td th:text="${payload.cultivationConditions}">—</td></tr>
+</table>
+
+<!-- 4. Cuestionario de Cumplimiento -->
+<h2>4. Cuestionario de Cumplimiento — <span th:text="${payload.certificationName}">Certificación</span></h2>
+<div class="answers" th:if="${payload.producerAnswers != null and !payload.producerAnswers.isEmpty()}">
+    <table>
+        <tr>
+            <td class="label" style="width:50%">Requisito</td>
+            <td class="label" style="width:35%">Respuesta</td>
+            <td class="label" style="width:15%">Cumple</td>
+        </tr>
+        <tr th:each="answer : ${payload.producerAnswers}">
+            <td th:text="${answer.question}">—</td>
+            <td th:text="${answer.answer}">—</td>
+            <td>
+                <span th:if="${answer.compliant}" class="compliant-yes">✓ Sí</span>
+                <span th:unless="${answer.compliant}" class="compliant-no">✗ No</span>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<!-- Requisitos faltantes -->
+<div class="missing"
+     th:if="${payload.missingRequirements != null and !payload.missingRequirements.isEmpty()}">
+    <strong>Requisitos pendientes antes de certificarse:</strong>
+    <ul>
+        <li th:each="req : ${payload.missingRequirements}" th:text="${req}">—</li>
+    </ul>
+</div>
+
+<!-- Pie de página -->
+<div class="footer">
+    <p>Plataforma Origen Magdalena — Sistema de Trazabilidad Agroturística</p>
+    <p>Documento generado automáticamente. Código: <span th:text="${payload.applicationCode}">—</span></p>
+    <p th:if="${payload.destinationEmail}">
+        Destinatario: <span th:text="${payload.destinationEmail}">—</span>
+    </p>
+</div>
+
+</body>
+</html>

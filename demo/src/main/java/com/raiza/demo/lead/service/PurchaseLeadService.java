@@ -42,6 +42,11 @@ public class PurchaseLeadService {
     }
 
     @Transactional(readOnly = true)
+    public LeadResponse findById(Long id) {
+        return leadMapper.toResponse(getLeadOrThrow(id));
+    }
+
+    @Transactional(readOnly = true)
     public List<LeadResponse> findByStatus(LeadStatus status) {
         return purchaseLeadRepository.findByLeadStatus(status).stream()
                 .map(leadMapper::toResponse)

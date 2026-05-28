@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<title>Origen Magdalena — Flujo por Actor</title>
+<style>
+  @page { size: A4; margin: 16mm 14mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", Arial, sans-serif; color:#1b2a1f; font-size:12px; line-height:1.5; }
+  h1 { font-size: 26px; color:#1b4332; }
+  h2 { font-size: 17px; color:#fff; padding:8px 12px; border-radius:5px; margin:0 0 12px; }
+  h2.prod  { background:#2d6a4f; }
+  h2.admin { background:#b8860b; }
+  h2.tour  { background:#e76f51; }
+  h2.buyer { background:#457b9d; }
+  h2.exp   { background:#9d4edd; }
+  h2.gen   { background:#1b4332; }
+  p { margin:6px 0; }
+  .muted { color:#6c757d; }
+  .page-break { page-break-before: always; }
+  code { font-family: Consolas, monospace; font-size:11px; }
+
+  .cover { text-align:center; padding:70px 0 30px; border-bottom:4px solid #2d6a4f; }
+  .cover .badge { display:inline-block; background:#e9c46a; color:#1b2a1f; padding:4px 14px;
+    border-radius:999px; font-weight:bold; font-size:11px; margin-bottom:18px; }
+  .cover h1 { font-size:34px; }
+  .cover .sub { font-size:15px; color:#6c757d; margin-top:8px; }
+
+  /* Paso */
+  .step { display:flex; align-items:flex-start; gap:10px; margin:10px 0;
+          border:1px solid #d7e6dc; border-radius:6px; padding:9px 11px; background:#fafdfb; }
+  .num { flex:0 0 26px; width:26px; height:26px; border-radius:50%; color:#fff;
+         font-weight:bold; text-align:center; line-height:26px; font-size:13px; }
+  .num.prod{background:#2d6a4f;} .num.admin{background:#b8860b;} .num.tour{background:#e76f51;}
+  .num.buyer{background:#457b9d;} .num.exp{background:#9d4edd;} .num.gen{background:#1b4332;}
+  .step .body { flex:1; }
+  .step .title { font-weight:bold; color:#1b2a1f; }
+  .step .desc { color:#54635a; font-size:11px; margin-top:2px; }
+
+  .ep { display:inline-block; margin-top:6px; font-family:Consolas, monospace; font-size:10.5px;
+        background:#1b2a1f; color:#b7e4c7; padding:3px 8px; border-radius:4px; }
+  .ep .m { font-weight:bold; color:#e9c46a; }
+  .ep.pub { background:#0d3b2e; }
+  .tag { display:inline-block; font-size:9px; padding:1px 6px; border-radius:3px; margin-left:6px;
+         vertical-align:middle; }
+  .tag.evt { background:#2d6a4f; color:#fff; font-family:monospace; }
+  .tag.state { background:#e9c46a; color:#1b2a1f; font-weight:bold; }
+  .tag.pub { background:#457b9d; color:#fff; }
+
+  .note { border-left:4px solid #e9c46a; background:#fffdf5; padding:8px 12px; border-radius:4px;
+          margin:10px 0; font-size:11px; }
+
+  table { width:100%; border-collapse:collapse; margin:8px 0; font-size:10.5px; }
+  th { background:#1b4332; color:#fff; padding:5px 7px; text-align:left; }
+  td { border:1px solid #cfe3d6; padding:4px 7px; }
+  tr:nth-child(even) td { background:#f6fbf8; }
+
+  .legend span { display:inline-block; margin-right:14px; font-size:10px; }
+  .dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:4px; vertical-align:middle; }
+  .flowbox { border:2px solid #2d6a4f; border-radius:6px; padding:7px 10px; margin:5px 0; background:#f6fbf8; font-size:11px; }
+  .arrow { text-align:center; color:#2d6a4f; font-weight:bold; font-size:15px; }
+</style>
+</head>
+<body>
+
+<!-- PORTADA -->
+<div class="cover">
+  <div class="badge">HACKATHON MAGDALENA · COLOMBIA 5.0</div>
+  <h1>Origen Magdalena</h1>
+  <div class="sub">Flujo completo paso a paso por actor</div>
+  <div class="sub">Cada paso relacionado con su endpoint REST</div>
+  <p class="muted" style="margin-top:22px;">Guía operativa del equipo — backend Spring Boot</p>
+</div>
+
+<h2 class="gen">Cómo leer este documento</h2>
+<p>El sistema tiene <b>5 actores</b>. Cada uno tiene su propio flujo. En cada paso verás:</p>
+<ul style="margin-left:18px;">
+  <li>El <b>número de paso</b> y la acción.</li>
+  <li>El <span class="ep"><span class="m">MÉTODO</span> /endpoint</span> que se consume.</li>
+  <li><span class="tag evt">EVENTO</span> si el sistema graba un evento de trazabilidad automático.</li>
+  <li><span class="tag state">ESTADO</span> si cambia el estado de un lote, certificación o lead.</li>
+  <li><span class="tag pub">PÚBLICO</span> si el endpoint no requiere login.</li>
+</ul>
+
+<div class="legend" style="margin:12px 0;">
+  <span><span class="dot" style="background:#2d6a4f"></span>Productor</span>
+  <span><span class="dot" style="background:#b8860b"></span>Admin</span>
+  <span><span class="dot" style="background:#e76f51"></span>Operador turístico</span>
+  <span><span class="dot" style="background:#457b9d"></span>Comprador / Turista</span>
+  <span><span class="dot" style="background:#9d4edd"></span>Exportador</span>
+</div>
+
+<h2 class="gen">Visión general — la cadena de valor conectada</h2>
+<div class="flowbox"><b>① PRODUCTOR</b> registra finca y lote → sube certificación</div>
+<div class="arrow">▼</div>
+<div class="flowbox"><b>② ADMIN</b> valida la certificación → el lote se vuelve exportable</div>
+<div class="arrow">▼</div>
+<div class="flowbox"><b>③ OPERADOR TURÍSTICO</b> vincula el lote a una experiencia con QR</div>
+<div class="arrow">▼</div>
+<div class="flowbox"><b>④ TURISTA / COMPRADOR</b> escanea el QR, ve la historia y deja intención de compra</div>
+<div class="arrow">▼</div>
+<div class="flowbox"><b>⑤ EXPORTADOR</b> recibe el lead, verifica trazabilidad y cierra la operación</div>
+
+<!-- ===================== PRODUCTOR ===================== -->
+<div class="page-break"></div>
+<h2 class="prod">① PRODUCTOR — registra su producción y se certifica</h2>
+
+<div class="step"><div class="num prod">1</div><div class="body">
+  <div class="title">Crea su cuenta eligiendo el flujo "Productor"</div>
+  <div class="desc">En la pantalla inicial elige "Soy productor". Envía sus datos + los de su finca/asociación. El sistema crea la cuenta con rol PRODUCER y devuelve el token (queda logueado).</div>
+  <span class="ep pub"><span class="m">POST</span> /api/v1/auth/register/producer</span> <span class="tag pub">PÚBLICO</span>
+</div></div>
+
+<div class="step"><div class="num prod">2</div><div class="body">
+  <div class="title">Registra su finca</div>
+  <div class="desc">Datos de origen: municipio, corregimiento, coordenadas, altitud, hectáreas.</div>
+  <span class="ep"><span class="m">POST</span> /api/v1/producers/{id}/farms</span>
+</div></div>
+
+<div class="step"><div class="num prod">3</div><div class="body">
+  <div class="title">Crea un lote de café / banano / cacao</div>
+  <div class="desc">El lote nace bloqueado para exportación hasta certificarse. El sistema genera código único (MGD-AÑO-XXXXXX) y su valor QR.</div>
+  <span class="ep"><span class="m">POST</span> /api/v1/lots</span>
+  <span class="tag state">CERTIFICATION_PENDING</span> <span class="tag evt">LOT_CREATED</span>
+</div></div>
+
+<div class="step"><div class="num prod">4</div><div class="body">
+  <div class="title">Registra eventos del cultivo y la cosecha</div>
+  <div class="desc">Cada evento se encadena con hash SHA-256 al anterior (trazabilidad inmutable). Ej: humedad, fecha de recolección, control de calidad.</div>
+  <span class="ep"><span class="m">POST</span> /api/v1/lots/{id}/events</span>
+  <span class="tag evt">HARVEST_COMPLETED</span> <span class="tag evt">QUALITY_CHECKED</span>
+</div></div>
+
+<div class="step"><div class="num prod">5</div><div class="body">
+  <div class="title">Sube la evidencia de certificación (Fairtrade / Rainforest Alliance)</div>
+  <div class="desc">Adjunta código de certificado, vigencia y evidencia. Queda pendiente de validación por el admin.</div>
+  <span class="ep"><span class="m">POST</span> /api/v1/lots/{id}/certifications</span>
+  <span class="tag state">PENDING_VALIDATION</span>
+</div></div>
+
+<div class="step"><div class="num prod">6</div><div class="body">
+  <div class="title">(Opcional) Genera la solicitud formal de certificación en PDF</div>
+  <div class="desc">El sistema arma un PDF con todos los datos (productor, finca, lote, cuestionario) y lo deja descargable.</div>
+  <span class="ep"><span class="m">POST</span> /api/v1/certification-applications</span><br/>
+  <span class="ep"><span class="m">GET</span> /api/v1/certification-applications/{id}/pdf</span>
+</div></div>
+
+<div class="step"><div class="num prod">7</div><div class="body">
+  <div class="title">Consulta sus lotes y la trazabilidad completa</div>
+  <div class="desc">Ve el estado de cada lote y su línea de tiempo de eventos.</div>
+  <span class="ep"><span class="m">GET</span> /api/v1/lots?producerId={id}</span><br/>
+  <span class="ep"><span class="m">GET</span> /api/v1/lots/{id}/traceability</span>
+</div></div>
+
+<div class="note"><b>Regla de negocio:</b> el productor SIEMPRE puede registrarse y subir lotes, pero el lote NO es exportable ni visible comercialmente hasta que el admin valide su certificación. "Registro abierto, comercialización restringida por cumplimiento".</div>
+
+<!-- ===================== ADMIN ===================== -->
+<div class="page-break"></div>
+<h2 class="admin">② ADMINISTRADOR — gestiona catálogos y valida el cumplimiento</h2>
+
+<div class="step"><div class="num admin">1</div><div class="body">
+  <div class="title">Inicia sesión</div>
+  <span class="ep pub"><span class="m">POST</span> /api/v1/auth/login</span> <span class="tag pub">PÚBLICO</span>
+</div></div>
+
+<div class="step"><div class="num admin">2</div><div class="body">
+  <div class="title">Mantiene los catálogos base</div>
+  <div class="desc">Productos (café, banano, cacao) y certificaciones (Fairtrade, Rainforest Alliance).</div>
+  <span class="ep"><span class="m">POST</span> /api/v1/products</span>
+  <span class="ep"><span class="m">POST</span> /api/v1/certifications</span>
+</div></div>
+
+<div class="step"><div class="num admin">3</div><div class="body">
+  <div class="title">Valida la certificación que subió el productor — PASO CLAVE</div>
+  <div class="desc">Aprueba (VALIDATED / CONDITIONALLY_VALID) o rechaza. Al validar, el lote pasa automáticamente a AVAILABLE y se vuelve exportable y visible al público.</div>
+  <span class="ep"><span class="m">PATCH</span> /api/v1/lot-certifications/{id}/validate</span>
+  <span class="tag state">lote → AVAILABLE</span> <span class="tag evt">CERTIFICATION_VALIDATED</span>
+</div></div>
+
+<div class="step"><div class="num admin">4</div><div class="body">
+  <div class="title">Revisa las solicitudes de certificación entrantes</div>
+  <span class="ep"><span class="m">GET</span> /api/v1/certification-applications</span>
+</div></div>
+
+<div class="step"><div class="num admin">5</div><div class="body">
+  <div class="title">Supervisa todo el sistema</div>
+  <div class="desc">Lotes, leads, productores, exportadores — acceso total de lectura.</div>
+  <span class="ep"><span class="m">GET</span> /api/v1/lots</span>
+  <span class="ep"><span class="m">GET</span> /api/v1/leads</span>
+  <span class="ep"><span class="m">GET</span> /api/v1/producers</span>
+</div></div>
+
+<!-- ===================== OPERADOR TURÍSTICO ===================== -->
+<div class="page-break"></div>
+<h2 class="tour">③ OPERADOR TURÍSTICO — convierte el lote en experiencia con QR</h2>
+
+<div class="step"><div class="num tour">1</div><div class="body">
+  <div class="title">Crea su cuenta eligiendo el flujo "Operador turístico"</div>
+  <div class="desc">Datos de la agencia/operadora: tipo, contacto, municipio, sitio web. Rol TOURISM_OPERATOR asignado automáticamente.</div>
+  <span class="ep pub"><span class="m">POST</span> /api/v1/auth/register/tourism-operator</span> <span class="tag pub">PÚBLICO</span>
+</div></div>
+
+<div class="step"><div class="num tour">2</div><div class="body">
+  <div class="title">Busca lotes certificados disponibles</div>
+  <div class="desc">Solo ve los lotes que ya pasaron validación (AVAILABLE).</div>
+  <span class="ep"><span class="m">GET</span> /api/v1/lots?status=AVAILABLE</span>
+</div></div>
+
+<div class="step"><div class="num tour">3</div><div class="body">
+  <div class="title">Crea una experiencia turística (genera el QR público)</div>
+  <div class="desc">Ej: "Cata de café en finca El Mirador, Minca". El sistema genera un qr_slug único.</div>
+  <span class="ep"><span class="m">POST</span> /api/v1/tourism/experiences</span>
+</div></div>
+
+<div class="step"><div class="num tour">4</div><div class="body">
+  <div class="title">Vincula el lote a la experiencia</div>
+  <div class="desc">Conecta el producto trazable con la experiencia que verá el turista.</div>
+  <span class="ep"><span class="m">POST</span> /api/v1/tourism/experiences/{experienceId}/lots/{lotId}</span>
+  <span class="tag evt">TOURISM_LINKED</span>
+</div></div>
+
+<div class="step"><div class="num tour">5</div><div class="body">
+  <div class="title">Consulta su experiencia y los lotes vinculados</div>
+  <span class="ep"><span class="m">GET</span> /api/v1/tourism/experiences/{id}</span><br/>
+  <span class="ep"><span class="m">GET</span> /api/v1/tourism/experiences/{id}/lots</span>
+</div></div>
+
+<div class="note"><b>Resultado:</b> el operador imprime o comparte el QR de la experiencia. Cualquier turista lo escanea sin necesidad de login (ver flujo del Comprador).</div>
+
+<!-- ===================== COMPRADOR / TURISTA ===================== -->
+<div class="page-break"></div>
+<h2 class="buyer">④ COMPRADOR / TURISTA — descubre el producto por QR</h2>
+
+<div class="step"><div class="num buyer">1</div><div class="body">
+  <div class="title">(Opcional) Crea cuenta eligiendo el flujo "Comprador / Consumidor"</div>
+  <div class="desc">No es obligatorio para ver la vista pública, pero permite identificar al comprador internacional.</div>
+  <span class="ep pub"><span class="m">POST</span> /api/v1/auth/register/buyer</span> <span class="tag pub">PÚBLICO</span>
+</div></div>
+
+<div class="step"><div class="num buyer">2</div><div class="body">
+  <div class="title">Escanea el QR y ve la historia completa del lote</div>
+  <div class="desc">Sin login. Muestra: productor, finca, producto, certificaciones validadas y la línea de tiempo con hashes.</div>
+  <span class="ep pub"><span class="m">GET</span> /public/trace/{qrSlug}</span> <span class="tag pub">PÚBLICO</span>
+</div></div>
+
+<div class="step"><div class="num buyer">3</div><div class="body">
+  <div class="title">El escaneo queda registrado en la trazabilidad</div>
+  <div class="desc">El sistema graba el evento de escaneo automáticamente.</div>
+  <span class="ep pub"><span class="m">POST</span> /public/trace/{qrSlug}/scan</span>
+  <span class="tag pub">PÚBLICO</span> <span class="tag evt">QR_SCANNED</span>
+</div></div>
+
+<div class="step"><div class="num buyer">4</div><div class="body">
+  <div class="title">Explora la experiencia turística asociada</div>
+  <span class="ep pub"><span class="m">GET</span> /public/experiences/{slug}</span> <span class="tag pub">PÚBLICO</span>
+</div></div>
+
+<div class="step"><div class="num buyer">5</div><div class="body">
+  <div class="title">Deja una intención de compra (lead)</div>
+  <div class="desc">Llena el formulario con cantidad, país destino y mensaje. El sistema crea el comprador (si no existe) y el lead.</div>
+  <span class="ep pub"><span class="m">POST</span> /public/trace/{qrSlug}/lead</span>
+  <span class="tag pub">PÚBLICO</span> <span class="tag state">lead NEW</span> <span class="tag evt">PURCHASE_INTENT_CREATED</span>
+</div></div>
+
+<!-- ===================== EXPORTADOR ===================== -->
+<div class="page-break"></div>
+<h2 class="exp">⑤ EXPORTADOR — convierte el interés en operación comercial</h2>
+
+<div class="step"><div class="num exp">1</div><div class="body">
+  <div class="title">Crea su cuenta eligiendo el flujo "Exportador"</div>
+  <div class="desc">Datos de la empresa exportadora: razón social, código de registro, contacto. Rol EXPORTER asignado automáticamente.</div>
+  <span class="ep pub"><span class="m">POST</span> /api/v1/auth/register/exporter</span> <span class="tag pub">PÚBLICO</span>
+</div></div>
+
+<div class="step"><div class="num exp">2</div><div class="body">
+  <div class="title">Revisa los leads entrantes</div>
+  <div class="desc">Ve todas las intenciones de compra; puede filtrar por estado (los nuevos primero).</div>
+  <span class="ep"><span class="m">GET</span> /api/v1/leads?status=NEW</span>
+</div></div>
+
+<div class="step"><div class="num exp">3</div><div class="body">
+  <div class="title">Verifica la trazabilidad y certificaciones del lote</div>
+  <div class="desc">Antes de comprometerse, valida origen, eventos y sellos del lote.</div>
+  <span class="ep"><span class="m">GET</span> /api/v1/lots/{id}/traceability</span><br/>
+  <span class="ep"><span class="m">GET</span> /api/v1/lots/{id}/certifications</span>
+</div></div>
+
+<div class="step"><div class="num exp">4</div><div class="body">
+  <div class="title">Avanza el lead en el embudo comercial</div>
+  <div class="desc">NEW → CONTACTED → QUALIFIED a medida que negocia con el comprador.</div>
+  <span class="ep"><span class="m">PATCH</span> /api/v1/leads/{id}/status</span>
+</div></div>
+
+<div class="step"><div class="num exp">5</div><div class="body">
+  <div class="title">Crea la revisión de exportación — cierra el flujo</div>
+  <div class="desc">Define incoterm, fecha estimada de entrega y notas. El lead y el lote pasan a IN_EXPORT_REVIEW.</div>
+  <span class="ep"><span class="m">POST</span> /api/v1/leads/{id}/export-review</span>
+  <span class="tag state">lote → IN_EXPORT_REVIEW</span> <span class="tag evt">EXPORT_REVIEWED</span>
+</div></div>
+
+<div class="step"><div class="num exp">6</div><div class="body">
+  <div class="title">Cierra la operación cambiando el estado del lote</div>
+  <div class="desc">RESERVED mientras negocia, SOLD al concretar la venta.</div>
+  <span class="ep"><span class="m">PATCH</span> /api/v1/lots/{id}/status</span>
+  <span class="tag state">SOLD</span>
+</div></div>
+
+<div class="step"><div class="num exp">7</div><div class="body">
+  <div class="title">Consulta el historial de sus revisiones</div>
+  <span class="ep"><span class="m">GET</span> /api/v1/exporters/{id}/reviews</span>
+</div></div>
+
+<!-- ===================== RESUMEN ===================== -->
+<div class="page-break"></div>
+<h2 class="gen">Resumen — endpoints por actor</h2>
+<table>
+  <tr><th>Actor</th><th>Endpoint de registro</th><th>Endpoints principales del flujo</th></tr>
+  <tr>
+    <td><b style="color:#2d6a4f">Productor</b></td>
+    <td><code>POST /auth/register/producer</code></td>
+    <td>POST /producers/{id}/farms · POST /lots · POST /lots/{id}/events · POST /lots/{id}/certifications · POST /certification-applications</td>
+  </tr>
+  <tr>
+    <td><b style="color:#b8860b">Admin</b></td>
+    <td><code>POST /auth/login</code></td>
+    <td>POST /products · POST /certifications · PATCH /lot-certifications/{id}/validate · GET /certification-applications</td>
+  </tr>
+  <tr>
+    <td><b style="color:#e76f51">Operador turístico</b></td>
+    <td><code>POST /auth/register/tourism-operator</code></td>
+    <td>GET /lots?status=AVAILABLE · POST /tourism/experiences · POST /tourism/experiences/{id}/lots/{lotId}</td>
+  </tr>
+  <tr>
+    <td><b style="color:#457b9d">Comprador / Turista</b></td>
+    <td><code>POST /auth/register/buyer</code></td>
+    <td>GET /public/trace/{qrSlug} · POST /public/trace/{qrSlug}/scan · POST /public/trace/{qrSlug}/lead</td>
+  </tr>
+  <tr>
+    <td><b style="color:#9d4edd">Exportador</b></td>
+    <td><code>POST /auth/register/exporter</code></td>
+    <td>GET /leads · GET /lots/{id}/traceability · PATCH /leads/{id}/status · POST /leads/{id}/export-review · PATCH /lots/{id}/status</td>
+  </tr>
+</table>
+
+<p style="margin-top:18px; text-align:center;" class="muted">
+Origen Magdalena · Flujo por actor · El registro asigna el rol automáticamente según el flujo elegido;
+cada acción queda trazada en la cadena inmutable de eventos.
+</p>
+
+</body>
+</html>
