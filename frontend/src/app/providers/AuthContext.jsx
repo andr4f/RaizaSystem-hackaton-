@@ -10,10 +10,19 @@ export function AuthProvider({ children }) {
   })
 
   const login = useCallback(async (credentials) => {
-    const data = await authApi.login(credentials)
-    localStorage.setItem('token', data.token)
-    localStorage.setItem('user', JSON.stringify(data.user))
-    setUser(data.user)
+    const response = await authApi.login(credentials)
+    const authData = response.data
+    localStorage.setItem('token', authData.token)
+    localStorage.setItem('user', JSON.stringify(authData))
+    setUser(authData)
+  }, [])
+
+  const register = useCallback(async (userData) => {
+    const response = await authApi.register(userData)
+    const authData = response.data
+    localStorage.setItem('token', authData.token)
+    localStorage.setItem('user', JSON.stringify(authData))
+    setUser(authData)
   }, [])
 
   const logout = useCallback(() => {
@@ -23,7 +32,7 @@ export function AuthProvider({ children }) {
   }, [])
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAuthenticated: !!user }}>
+    <AuthContext.Provider value={{ user, login, register, logout, isAuthenticated: !!user }}>
       {children}
     </AuthContext.Provider>
   )
