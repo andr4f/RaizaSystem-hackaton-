@@ -1,0 +1,14 @@
+package com.raiza.demo.shared.enums;
+
+public enum TraceEventType {
+    LOT_CREATED,
+    CULTIVATION_UPDATED,
+    CERTIFICATION_VALIDATED,
+    HARVEST_COMPLETED,
+    QUALITY_CHECKED,
+    TOURISM_LINKED,
+    QR_SCANNED,
+    PURCHASE_INTENT_CREATED,
+    EXPORT_REVIEWED,
+    LOT_RESERVED
+}
