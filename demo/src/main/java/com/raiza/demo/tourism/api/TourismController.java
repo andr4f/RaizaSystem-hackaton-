@@ -40,6 +40,12 @@ public class TourismController {
         return ResponseEntity.ok(ApiResponse.ok(tourismService.findAllOperators()));
     }
 
+    @GetMapping("/operators/{id}/experiences")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<List<ExperienceResponse>>> findExperiencesByOperator(@PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponse.ok(tourismService.findExperiencesByOperator(id)));
+    }
+
     // ── Experiencias turísticas ───────────────────────────────────────────
 
     @PostMapping("/experiences")

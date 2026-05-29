@@ -1,6 +1,17 @@
 HELP.md
 target/
 .mvn/wrapper/maven-wrapper.jar
+
+# Environment variables
+.env
+.env.local
+*.env
+
+# Application secrets
+src/main/resources/application-local.properties
+src/main/resources/application-local.yml
+src/main/resources/application-secret.properties
+
 !**/src/main/**/target/
 !**/src/test/**/target/
 

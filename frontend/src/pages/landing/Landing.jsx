@@ -1,8 +1,13 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   Sprout, MapPin, QrCode, Check, Users, Camera, Globe, ShoppingCart,
-  Leaf, TrendingUp, ArrowRight, Award
+  Leaf, TrendingUp, ArrowRight, Award, Menu, X
 } from 'lucide-react'
+
+import imagenCafeTabi from "./assets/imagen-cafe-tabi.png"
+import imagenCacaoFino from "./assets/imagen-cacao-fino.jpg"
+import imagenBananoHarton from "./assets/banano-harton.webp"
 
 const InstagramIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -28,6 +33,11 @@ import communityImg from './assets/imagen-login.png'
 import './Landing.css'
 
 const Landing = () => {
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [cardOpen, setCardOpen] = useState(false)
+
+  const closeMenu = () => setMenuOpen(false)
+
   return (
     <div className="lnd">
 
@@ -35,16 +45,21 @@ const Landing = () => {
       <header className="lnd-nav">
         <div className="lnd-nav__inner">
           <div className="lnd-nav__brand">
-            <Sprout size={18} className="lnd-nav__leaf" />
-            <span>RAIZA</span>
+            <img src="/logo-nombre.svg" alt="RAIZA" className="lnd-nav__logo" />
           </div>
-          <nav className="lnd-nav__links">
-            <a href="#inicio">Inicio</a>
-            <a href="#como">¿Cómo funciona?</a>
-            <a href="#productos">Productos</a>
-            <a href="#roles">Para quién</a>
-            <a href="#nosotros">Sobre nosotros</a>
-            <a href="#blog">Blog</a>
+          <nav className={`lnd-nav__links${menuOpen ? ' lnd-nav__links--open' : ''}`}>
+            <a href="#inicio" onClick={closeMenu}>Inicio</a>
+            <a href="#como" onClick={closeMenu}>¿Cómo funciona?</a>
+            <a href="#productos" onClick={closeMenu}>Productos</a>
+            <a href="#roles" onClick={closeMenu}>Para quién</a>
+            <a href="#nosotros" onClick={closeMenu}>Sobre nosotros</a>
+            <a href="#blog" onClick={closeMenu}>Blog</a>
+            <div className="lnd-nav__actions-mobile">
+              <Link to="/login" className="lnd-btn--ghost" onClick={closeMenu}>Iniciar sesión</Link>
+              <Link to="/register" className="lnd-btn--primary" onClick={closeMenu}>
+                Comenzar ahora <ArrowRight size={14} />
+              </Link>
+            </div>
           </nav>
           <div className="lnd-nav__actions">
             <Link to="/login" className="lnd-btn--ghost">Iniciar sesión</Link>
@@ -52,6 +67,13 @@ const Landing = () => {
               Comenzar ahora <ArrowRight size={14} />
             </Link>
           </div>
+          <button
+            className="lnd-nav__hamburger"
+            onClick={() => setMenuOpen(o => !o)}
+            aria-label="Menú"
+          >
+            {menuOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
         </div>
       </header>
 
@@ -91,7 +113,8 @@ const Landing = () => {
             </div>
           </div>
 
-          <div className="lnd-hero__card">
+          {/* Card visible en desktop */}
+          <div className="lnd-hero__card lnd-hero__card--desktop">
             <div className="lnd-hero__card-header">
               <span className="lnd-hero__card-check-icon"><Check size={10} /></span>
               <span>Producto trazado</span>
@@ -113,8 +136,49 @@ const Landing = () => {
               Ver trazabilidad completa →
             </a>
           </div>
+
+          {/* Botón QR flotante en móvil */}
+          <button
+            className="lnd-hero__qr-trigger"
+            onClick={() => setCardOpen(true)}
+            aria-label="Ver producto trazado"
+          >
+            <QrCode size={20} />
+            <span>Ver producto trazado</span>
+          </button>
         </div>
       </section>
+
+      {/* ── MODAL CARD MÓVIL ── */}
+      {cardOpen && (
+        <div className="lnd-card-modal__backdrop" onClick={() => setCardOpen(false)}>
+          <div className="lnd-card-modal__box" onClick={e => e.stopPropagation()}>
+            <button className="lnd-card-modal__close" onClick={() => setCardOpen(false)} aria-label="Cerrar">
+              <X size={18} />
+            </button>
+            <div className="lnd-hero__card-header">
+              <span className="lnd-hero__card-check-icon"><Check size={10} /></span>
+              <span>Producto trazado</span>
+            </div>
+            <div className="lnd-hero__card-body">
+              <div className="lnd-hero__card-info">
+                <strong>Café Tabi Variedad Colombia</strong>
+                <span>Finca La Esperanza</span>
+                <div className="lnd-hero__card-location">
+                  <MapPin size={11} />
+                  <span>Sierra Nevada de Santa Marta</span>
+                </div>
+              </div>
+              <div className="lnd-hero__card-qr">
+                <QrCode size={72} />
+              </div>
+            </div>
+            <a href="#" className="lnd-hero__card-link">
+              Ver trazabilidad completa →
+            </a>
+          </div>
+        </div>
+      )}
 
       {/* ── PARTNERS ── */}
       <section className="lnd-partners">
@@ -169,7 +233,7 @@ const Landing = () => {
 
           <div className="lnd-products__grid">
             <div className="lnd-product-card">
-              <div className="lnd-product-card__img lnd-product-card__img--cafe" />
+              <img className="lnd-product-card__img img-card-product" src={imagenCafeTabi} alt="Café Tabi" />
               <div className="lnd-product-card__body">
                 <span className="lnd-product-card__cat">CAFÉ</span>
                 <h3>Café Tabi Variedad Colombia</h3>
@@ -183,7 +247,7 @@ const Landing = () => {
               </div>
             </div>
             <div className="lnd-product-card">
-              <div className="lnd-product-card__img lnd-product-card__img--cacao" />
+              <img className="lnd-product-card__img img-card-product" src={imagenCacaoFino} alt="Cacao Fino" />
               <div className="lnd-product-card__body">
                 <span className="lnd-product-card__cat">CACAO</span>
                 <h3>Cacao Fino de Aroma</h3>
@@ -197,7 +261,7 @@ const Landing = () => {
               </div>
             </div>
             <div className="lnd-product-card">
-              <div className="lnd-product-card__img lnd-product-card__img--banano" />
+              <img className="lnd-product-card__img img-card-product" src={imagenBananoHarton} alt="Banano Hartón" />
               <div className="lnd-product-card__body">
                 <span className="lnd-product-card__cat">BANANO</span>
                 <h3>Banano Hartón Orgánico</h3>
@@ -350,8 +414,7 @@ const Landing = () => {
         <div className="lnd-footer__inner">
           <div className="lnd-footer__brand-col">
             <div className="lnd-footer__brand">
-              <Sprout size={18} />
-              <span>RAIZA</span>
+              <img src="/logo-nombre.svg" alt="RAIZA" className="lnd-footer__logo" />
             </div>
             <p className="lnd-footer__tagline">
               Trazabilidad, confianza y territorio para conectar el agro

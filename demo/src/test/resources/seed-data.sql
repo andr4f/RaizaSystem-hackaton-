@@ -28,8 +28,8 @@ VALUES (1, 'CAF-MINCA-001', 1, 1, 1, '2026-05-15', 250.00, 'kg', 'lavado', 'Cult
 
 -- Lot Certification
 INSERT INTO lot_certification (id, lot_id, certification_id, certificate_code, valid_from, valid_to, status, created_at, updated_at)
-VALUES (1, 1, 1, 'FT-2026-001', '2026-01-01', '2027-01-01', 'ACTIVE', NOW(), NOW()),
-       (2, 1, 2, 'RA-2026-001', '2026-01-01', '2027-01-01', 'ACTIVE', NOW(), NOW());
+VALUES (1, 1, 1, 'FT-2026-001', '2026-01-01', '2027-01-01', 'VALIDATED', NOW(), NOW()),
+       (2, 1, 2, 'RA-2026-001', '2026-01-01', '2027-01-01', 'VALIDATED', NOW(), NOW());
 
 -- Trace Events
 INSERT INTO trace_event (id, lot_id, event_type, event_timestamp, actor_type, actor_id, title, description, latitude, longitude, metric_name, metric_value, metric_unit, hash_value, previous_hash, created_at)
@@ -66,8 +66,8 @@ INSERT INTO export_review (id, lead_id, exporter_id, review_status, notes, incot
 VALUES (1, 1, 1, 'PENDING_REVIEW', 'Revisar disponibilidad y documentación del lote', 'FOB', NOW(), NOW());
 
 -- App User
-INSERT INTO app_user (id, name, email, password, role, active, created_at, updated_at)
-VALUES (1, 'Admin Magdalena', 'admin@magdalena.co', '$2a$10$dummy_hash_for_testing', 'ADMIN', true, NOW(), NOW());
+INSERT INTO app_user (id, name, email, password, role, active, onboarding_completed, created_at, updated_at)
+VALUES (1, 'Admin Magdalena', 'admin@magdalena.co', '$2a$10$dummy_hash_for_testing', 'ADMIN', true, true, NOW(), NOW());
 
 -- Push sequences past explicit IDs so entity saves don't conflict
 ALTER SEQUENCE product_id_seq RESTART WITH 100;
