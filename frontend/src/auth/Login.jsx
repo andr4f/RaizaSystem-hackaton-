@@ -6,6 +6,12 @@ import { Mail, Lock, Eye, EyeOff, ArrowRight, Sprout, ShieldCheck } from 'lucide
 import './Login.css'
 import imagenLogin from '../assets/imagen-login.png'
 
+const ROLE_DASHBOARD = {
+  PRODUCER: '/dashboard/producer',
+  EXPORTER: '/dashboard/exporter',
+  TOURISM_OPERATOR: '/dashboard/tourism',
+}
+
 const Login = () => {
   const { login } = useAuth()
   const navigate = useNavigate()
@@ -14,8 +20,8 @@ const Login = () => {
 
   const onSubmit = async (data) => {
     try {
-      await login(data)
-      navigate('/')
+      const authData = await login(data)
+      navigate(ROLE_DASHBOARD[authData?.role] ?? '/')
     } catch (err) {
       setError('root', { message: err.message })
     }

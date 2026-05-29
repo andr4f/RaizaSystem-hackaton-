@@ -4,9 +4,11 @@ import { useProducerData } from '../useProducerData'
 import './sections.css'
 
 const STATUS = {
-  ACTIVE: ['Activo', 'green'], AVAILABLE: ['Disponible', 'green'],
-  IN_REVIEW: ['En proceso', 'amber'], RESERVED: ['Reservado', 'blue'],
-  SOLD: ['Vendido', 'gray'], DRAFT: ['Borrador', 'gray'],
+  AVAILABLE: ['Disponible', 'green'],
+  CERTIFICATION_PENDING: ['Cert. pendiente', 'amber'],
+  RESERVED: ['Reservado', 'blue'],
+  IN_EXPORT_REVIEW: ['En revisión', 'amber'],
+  SOLD: ['Vendido', 'gray'], INACTIVE: ['Inactivo', 'gray'],
 }
 
 function fmt(iso) {

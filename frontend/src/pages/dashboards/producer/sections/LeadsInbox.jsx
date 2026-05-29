@@ -4,8 +4,8 @@ import './sections.css'
 
 const STATUS = {
   NEW: ['Nuevo', 'green'], CONTACTED: ['Contactado', 'blue'],
-  NEGOTIATING: ['Negociando', 'amber'], CLOSED: ['Cerrado', 'gray'],
-  REJECTED: ['Rechazado', 'red'],
+  QUALIFIED: ['Calificado', 'amber'], IN_EXPORT_REVIEW: ['En revisión export.', 'amber'],
+  CLOSED_WON: ['Cerrado (ganado)', 'green'], CLOSED_LOST: ['Cerrado (perdido)', 'gray'],
 }
 
 function fmt(iso) {

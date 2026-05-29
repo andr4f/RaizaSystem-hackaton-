@@ -91,11 +91,10 @@
 .ph-lot-date { font-size: 11.5px; color: var(--c-gray-400); white-space: nowrap; }
 
 .ph-badge { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
-.ph-badge--active, .ph-badge--available { background: #dcfce7; color: #15803d; }
-.ph-badge--in_review { background: var(--c-amber-50); color: var(--c-amber); }
+.ph-badge--available { background: #dcfce7; color: #15803d; }
+.ph-badge--certification_pending, .ph-badge--in_export_review { background: var(--c-amber-50); color: var(--c-amber); }
 .ph-badge--reserved { background: #dbeafe; color: #1d4ed8; }
-.ph-badge--sold { background: var(--c-gray-100); color: var(--c-gray-500); }
-.ph-badge--draft { background: var(--c-gray-100); color: var(--c-gray-500); }
+.ph-badge--sold, .ph-badge--inactive { background: var(--c-gray-100); color: var(--c-gray-500); }
 
 /* Chart */
 .ph-chart-note { font-size: 11px; color: var(--c-gray-400); }

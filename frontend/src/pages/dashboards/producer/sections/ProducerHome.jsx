@@ -18,8 +18,9 @@ const SCAN_SERIES = [
 ]
 
 const STATUS_LABEL = {
-  ACTIVE: 'Activo', AVAILABLE: 'Activo', IN_REVIEW: 'En proceso',
-  RESERVED: 'Reservado', SOLD: 'Vendido', DRAFT: 'Borrador',
+  AVAILABLE: 'Disponible', CERTIFICATION_PENDING: 'Cert. pendiente',
+  RESERVED: 'Reservado', IN_EXPORT_REVIEW: 'En revisión',
+  SOLD: 'Vendido', INACTIVE: 'Inactivo',
 }
 
 function fmtDate(iso) {
@@ -36,9 +37,9 @@ const ProducerHome = () => {
   const firstName = (producer?.name || 'Productor').split(' ')[0]
 
   const stats = useMemo(() => {
-    const activeLots = lots.filter(l => ['ACTIVE', 'AVAILABLE', 'IN_REVIEW'].includes(l.status)).length
+    const activeLots = lots.filter(l => ['AVAILABLE', 'CERTIFICATION_PENDING', 'RESERVED'].includes(l.status)).length
     const validatedCerts = applications.filter(a => a.status === 'APPROVED' || a.status === 'VALIDATED').length
-    const openLeads = leads.filter(l => l.leadStatus === 'NEW' || l.leadStatus === 'CONTACTED').length
+    const openLeads = leads.filter(l => ['NEW', 'CONTACTED', 'QUALIFIED'].includes(l.leadStatus)).length
     return {
       activeLots: activeLots || lots.length,
       qrScans: 248, // placeholder — sin endpoint agregado

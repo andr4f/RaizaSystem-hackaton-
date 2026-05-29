@@ -24,7 +24,7 @@ const ProducerLayout = () => {
   const navigate = useNavigate()
   const { lots, producer } = useProducerData()
 
-  const activeLots = lots.filter(l => l.status === 'ACTIVE' || l.status === 'AVAILABLE').length || lots.length
+  const activeLots = lots.filter(l => ['AVAILABLE', 'CERTIFICATION_PENDING', 'RESERVED'].includes(l.status)).length || lots.length
   const location = producer?.municipality
     ? `${producer.municipality}${producer.department ? ', ' + producer.department : ''}`
     : 'Sierra Nevada de Santa Marta'
