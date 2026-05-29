@@ -1,0 +1,20 @@
+.qr-tile {
+  background: #fff;
+  border: 1px solid var(--s-gray-200, #e5e7eb);
+  border-radius: 16px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+.qr-canvas-wrap {
+  background: #fff;
+  border: 1px solid #f3f4f6;
+  border-radius: 12px;
+  padding: 8px;
+}
+.qr-info { display: flex; flex-direction: column; align-items: center; gap: 3px; text-align: center; }
+.qr-product { font-size: 14px; font-weight: 600; color: #111827; }
+.qr-actions { display: flex; gap: 8px; width: 100%; }
+.qr-actions .sec-btn { flex: 1; justify-content: center; padding: 9px 10px; font-size: 12.5px; }

@@ -84,21 +84,21 @@ public class RegistrationService {
             case PRODUCER -> {
                 CreateProducerRequest profile = new CreateProducerRequest(
                         req.getName(), null, null, ProducerType.INDIVIDUAL,
-                        null, req.getEmail(), "Sin definir", "Magdalena", null);
+                        null, req.getEmail(), "Sin definir", "Magdalena", null, null, null);
                 ProducerResponse producer = producerService.create(profile);
                 yield createAccount(req.getEmail(), req.getPassword(), req.getName(),
                         UserRole.PRODUCER, producer.id());
             }
             case EXPORTER -> {
                 CreateExporterRequest profile = new CreateExporterRequest(
-                        req.getName(), null, null, null, null, req.getEmail(), null);
+                        req.getName(), null, null, null, null, req.getEmail(), null, null, null, null);
                 ExporterResponse exporter = exporterService.create(profile);
                 yield createAccount(req.getEmail(), req.getPassword(), req.getName(),
                         UserRole.EXPORTER, exporter.id());
             }
             case TOURISM_OPERATOR -> {
                 CreateTourismOperatorRequest profile = new CreateTourismOperatorRequest(
-                        req.getName(), "General", null, null, req.getEmail(), null, null);
+                        req.getName(), "General", null, null, req.getEmail(), null, null, null, null, null);
                 TourismOperatorResponse operator = tourismService.createOperator(profile);
                 yield createAccount(req.getEmail(), req.getPassword(), req.getName(),
                         UserRole.TOURISM_OPERATOR, operator.id());

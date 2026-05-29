@@ -1,0 +1,24 @@
+.ld-back {
+  display: inline-flex; align-items: center; gap: 6px;
+  border: none; background: transparent; padding: 0;
+  font-size: 13px; color: #6b7280; cursor: pointer; align-self: flex-start;
+}
+.ld-back:hover { color: #111827; }
+
+.ld-grid { display: grid; grid-template-columns: 1fr 280px; gap: 16px; align-items: start; }
+.ld-main, .ld-side { display: flex; flex-direction: column; gap: 16px; }
+
+.ld-h3 { display: flex; align-items: center; gap: 7px; font-size: 14px; font-weight: 700; color: #111827; }
+.ld-h3 svg { color: #16a34a; }
+
+.ld-fields { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px 24px; }
+.ld-fields dt { font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: #9ca3af; margin-bottom: 2px; }
+.ld-fields dd { font-size: 13.5px; color: #111827; font-weight: 500; }
+
+.ld-certs { display: flex; flex-direction: column; gap: 8px; }
+.ld-certs li { display: flex; align-items: center; justify-content: space-between; font-size: 13px; padding: 8px 0; border-bottom: 1px solid #f3f4f6; }
+.ld-certs li:last-child { border-bottom: none; }
+
+.ld-qr { align-items: center; text-align: center; }
+
+@media (max-width: 900px) { .ld-grid { grid-template-columns: 1fr; } }

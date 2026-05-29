@@ -11,10 +11,12 @@
   },
   "dependencies": {
     "lucide-react": "^0.500.0",
+    "qrcode.react": "^4.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.56.0",
     "react-router-dom": "^7.15.1",
+    "recharts": "^3.8.1",
     "zod": "^3.24.0"
   },
   "devDependencies": {
