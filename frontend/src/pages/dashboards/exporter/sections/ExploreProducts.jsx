@@ -63,7 +63,7 @@ const ExploreProducts = () => {
                 <div className="esec-tile-img"><Leaf size={26} /></div>
                 <div className="esec-tile-body">
                   <span className="esec-tile-name">{lot.productName || lot.lotCode}</span>
-                  <span className="esec-tile-meta">{lot.farmName || 'Finca'} · {lot.municipality || 'Magdalena'}</span>
+                  <span className="esec-tile-meta">{lot.producerName || lot.farmName || 'Productor'}</span>
                   <span className="esec-tile-meta">Disponible <strong>{lot.availableQuantity} {lot.unitOfMeasure}</strong></span>
                   <span className={`esec-badge esec-badge--${tone}`}>{label}</span>
                   <div className="esec-tile-foot">

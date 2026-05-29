@@ -37,7 +37,7 @@ const ExporterReports = () => {
       <div className="esec-card" style={{ padding: 20 }}>
         <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 2 }}>Volumen negociado (Ton)</div>
         <div style={{ fontSize: 30, fontWeight: 700, marginBottom: 8 }}>
-          {totalVolume || 320} <span style={{ fontSize: 13, color: '#16a34a' }}>↑18%</span>
+          {totalVolume}
         </div>
         <ResponsiveContainer width="100%" height={220}>
           <AreaChart data={VOLUME_SERIES} margin={{ top: 10, right: 8, left: -20, bottom: 0 }}>

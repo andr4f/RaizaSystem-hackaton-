@@ -24,7 +24,7 @@ const ExporterLayout = () => {
   const navigate = useNavigate()
   const { verifiedLots, leads } = useExporterData()
 
-  const newLeads = leads.filter(l => ['NEW', 'CONTACTED'].includes(l.leadStatus)).length || leads.length
+  const newLeads = leads.filter(l => ['NEW', 'CONTACTED'].includes(l.leadStatus)).length
 
   const handleLogout = () => { logout(); navigate('/login') }
 
@@ -61,9 +61,9 @@ const ExporterLayout = () => {
         <div className="el-stockcard" onClick={() => navigate('/dashboard/exporter/lotes')}>
           <div className="el-stockcard-overlay">
             <span className="el-stockcard-label">Lotes disponibles</span>
-            <strong className="el-stockcard-num">{verifiedLots.length || 128}</strong>
+            <strong className="el-stockcard-num">{verifiedLots.length}</strong>
             <span className="el-stockcard-leads">
-              <span className="el-stockcard-dot" /> {newLeads || 16} nuevos leads
+              <span className="el-stockcard-dot" /> {newLeads} nuevos leads
             </span>
           </div>
         </div>

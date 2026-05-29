@@ -1,30 +1,33 @@
 import { useMemo } from 'react'
-import { Users, Phone, MapPin } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { Users, Package } from 'lucide-react'
 import { useExporterData } from '../useExporterData'
 import './sections.css'
 
 const Contacts = () => {
+  const navigate = useNavigate()
   const { lots, loading, error } = useExporterData()
 
   // Productores únicos derivados de los lotes disponibles.
   const producers = useMemo(() => {
     const map = new Map()
     lots.forEach(l => {
-      const key = l.producerId || l.farmName || l.productName
+      const key = l.producerId || l.producerName || l.farmName
       if (!key) return
       if (!map.has(key)) {
         map.set(key, {
           key,
-          name: l.producerName || l.farmName || 'Productor',
+          name: l.producerName || 'Productor',
           farm: l.farmName || 'Finca',
-          location: l.municipality || 'Magdalena',
-          phone: l.producerPhone || null,
+          products: new Set(),
           lots: 0,
         })
       }
-      map.get(key).lots += 1
+      const entry = map.get(key)
+      entry.lots += 1
+      if (l.productName) entry.products.add(l.productName)
     })
-    return [...map.values()]
+    return [...map.values()].map(p => ({ ...p, products: [...p.products] }))
   }, [lots])
 
   return (
@@ -54,13 +57,12 @@ const Contacts = () => {
                 <span className="esec-tile-name">{p.name}</span>
                 <span className="esec-tile-meta">{p.farm}</span>
                 <span className="esec-tile-meta" style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                  <MapPin size={13} /> {p.location}
+                  <Package size={13} /> {p.products.join(', ') || 'Sin productos'}
                 </span>
                 <span className="esec-tile-meta"><strong>{p.lots}</strong> lote(s) disponible(s)</span>
                 <div className="esec-tile-foot">
-                  <button className="esec-tile-btn" disabled={!p.phone} style={{ opacity: p.phone ? 1 : 0.6 }}>
-                    <Phone size={13} style={{ marginRight: 6, verticalAlign: -2 }} />
-                    {p.phone || 'Sin teléfono'}
+                  <button className="esec-tile-btn" onClick={() => navigate('/dashboard/exporter/explorar')}>
+                    Ver lotes →
                   </button>
                 </div>
               </div>

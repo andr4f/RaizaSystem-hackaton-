@@ -1,8 +1,10 @@
 import { api } from './client.js'
 
 export const exporterApi = {
-  getReviews: () => api.get('/exporters/reviews'),
-  getReviewById: (id) => api.get(`/exporters/reviews/${id}`),
-  createReview: (data) => api.post('/exporters/reviews', data),
-  updateReview: (id, data) => api.put(`/exporters/reviews/${id}`, data),
+  getAll: () => api.get('/exporters'),
+  getById: (id) => api.get(`/exporters/${id}`),
+  // Revisiones de exportación (pipeline del exportador)
+  getReviews: (id) => api.get(`/exporters/${id}/reviews`),
+  // Crear revisión de exportación a partir de un lead
+  createReview: (leadId, data) => api.post(`/leads/${leadId}/export-review`, data),
 }

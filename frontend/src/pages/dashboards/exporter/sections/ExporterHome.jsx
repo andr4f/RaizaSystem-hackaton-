@@ -7,26 +7,29 @@ import {
 import { useExporterData } from '../useExporterData'
 import cafeTabiImg from '../../../../assets/imagen-cafe-tabi.png'
 import cacaoFinoImg from '../../../../assets/imagen-cacao-fino.jpg'
+import bananoImg from '../../../../assets/banano-harton.webp'
 import './ExporterHome.css'
 
-// Mapa de estados de lead → etiqueta + tono visible en la tabla de oportunidades.
+// Estado de lead → etiqueta + tono visible en la tabla de oportunidades.
 const LEAD_STATUS = {
   NEW: ['Nuevo', 'green'], CONTACTED: ['Negociación', 'amber'],
   QUALIFIED: ['Propuesta', 'green'], IN_EXPORT_REVIEW: ['En revisión', 'amber'],
   CLOSED_WON: ['Cerrado', 'green'], CLOSED_LOST: ['Perdido', 'gray'],
 }
+const ACTIVE_LEADS = ['NEW', 'CONTACTED', 'QUALIFIED', 'IN_EXPORT_REVIEW']
+const REVIEW_LABEL = {
+  PENDING_REVIEW: 'Pendiente de revisión', UNDER_REVIEW: 'En revisión',
+  APPROVED: 'Aprobada', REJECTED: 'Rechazada',
+}
+const ACTIVE_REVIEWS = ['PENDING_REVIEW', 'UNDER_REVIEW']
 
-// Filas de muestra: se usan solo si aún no hay leads reales en el back.
-const SAMPLE_OPPS = [
-  { id: 's1', productName: 'Café Orgánico', company: 'Green Valley Imports', cc: 'ALE', qty: 45, unit: 'Ton', leadStatus: 'CONTACTED', when: 'Hoy, 09:30 AM' },
-  { id: 's2', productName: 'Cacao Fino de Aroma', company: 'Cacao & Co', cc: 'BEL', qty: 20, unit: 'Ton', leadStatus: 'QUALIFIED', when: 'Ayer' },
-]
-
-const ACTIVITY = [
-  { dot: 'green', title: 'Nuevo lead de Café', text: 'Green Valley Imports ha solicitado cotización.', when: 'Hace 2 horas' },
-  { dot: 'amber', title: 'Lote de Cacao verificado', text: 'Lote #CC-045 completó trazabilidad documental.', when: 'Hace 5 horas' },
-  { dot: 'blue',  title: 'Certificación Fair Trade', text: 'Asociación ASOPROKA renovó su sello.', when: 'Ayer' },
-]
+function lotImage(productName) {
+  const p = (productName || '').toLowerCase()
+  if (p.includes('cacao')) return cacaoFinoImg
+  if (p.includes('café') || p.includes('cafe')) return cafeTabiImg
+  if (p.includes('banano')) return bananoImg
+  return null
+}
 
 function fmtWhen(iso) {
   if (!iso) return '—'
@@ -36,35 +39,66 @@ function fmtWhen(iso) {
 
 const ExporterHome = () => {
   const navigate = useNavigate()
-  const { user, lots, verifiedLots, leads, loading } = useExporterData()
+  const { user, exporter, reviews, verifiedLots, leads, lotsById, loading } = useExporterData()
 
-  const firstName = (user?.name || 'Exportador').split(' ')[0]
+  const firstName = (exporter?.contactName || user?.name || 'Exportador').split(' ')[0]
 
   const stats = useMemo(() => {
-    const openOpps = leads.filter(l => ['NEW', 'CONTACTED', 'QUALIFIED', 'IN_EXPORT_REVIEW'].includes(l.leadStatus)).length
-    const inProcess = leads.filter(l => l.leadStatus === 'IN_EXPORT_REVIEW').length
-    const negVolume = verifiedLots.reduce((sum, l) => sum + (Number(l.availableQuantity) || 0), 0)
+    const openOpps = leads.filter(l => ACTIVE_LEADS.includes(l.leadStatus)).length
+    const activeReviews = reviews.filter(r => ACTIVE_REVIEWS.includes(r.reviewStatus)).length
+    const volume = leads.reduce((s, l) => s + (Number(l.requestedQuantity) || 0), 0)
     return {
-      verified: verifiedLots.length || 128,
-      opportunities: openOpps || leads.length || 16,
-      orders: inProcess || 7,
-      volume: negVolume || 320,
+      verified: verifiedLots.length,
+      opportunities: openOpps,
+      orders: activeReviews,
+      volume,
     }
-  }, [leads, verifiedLots])
+  }, [leads, reviews, verifiedLots])
 
-  const opps = useMemo(() => {
-    if (leads.length === 0) return SAMPLE_OPPS
-    return leads.slice(0, 5).map(l => ({
-      id: l.id,
-      productName: l.productName || l.lotProductName || 'Producto',
-      company: l.buyerCompany || l.companyName || l.buyerName || 'Comprador',
-      cc: (l.countryCode || l.country || '').slice(0, 3).toUpperCase() || '—',
-      qty: l.quantity ?? l.volume ?? '—',
-      unit: l.unitOfMeasure || 'Ton',
-      leadStatus: l.leadStatus,
-      when: fmtWhen(l.updatedAt || l.createdAt),
+  const opps = useMemo(
+    () => leads.slice(0, 5).map(l => {
+      const lot = lotsById.get(l.lotId)
+      return {
+        id: l.id,
+        productName: lot?.productName || l.lotCode || 'Producto',
+        buyer: l.buyerName || 'Comprador',
+        cc: (l.destinationCountry || '').slice(0, 3).toUpperCase() || '—',
+        qty: l.requestedQuantity ?? '—',
+        unit: l.unitOfMeasure || '',
+        leadStatus: l.leadStatus,
+        when: fmtWhen(l.createdAt),
+      }
+    }),
+    [leads, lotsById],
+  )
+
+  const activity = useMemo(() => {
+    const items = []
+    reviews.forEach(r => items.push({
+      dot: r.reviewStatus === 'PENDING_REVIEW' ? 'amber' : 'blue',
+      title: 'Revisión de exportación',
+      text: `${REVIEW_LABEL[r.reviewStatus] || r.reviewStatus}${r.incoterm ? ' · ' + r.incoterm : ''}`,
+      ts: r.createdAt,
     }))
-  }, [leads])
+    leads.forEach(l => {
+      const lot = lotsById.get(l.lotId)
+      items.push({
+        dot: 'green',
+        title: `Nuevo lead de ${lot?.productName || l.lotCode || 'producto'}`,
+        text: `${l.buyerName || 'Comprador'}${l.destinationCountry ? ' · ' + l.destinationCountry : ''}`,
+        ts: l.createdAt,
+      })
+    })
+    verifiedLots.forEach(l => items.push({
+      dot: 'blue',
+      title: `Lote ${l.lotCode} verificado`,
+      text: `${l.productName} · ${l.availableQuantity} ${l.unitOfMeasure}`,
+      ts: l.createdAt,
+    }))
+    return items
+      .sort((a, b) => new Date(b.ts) - new Date(a.ts))
+      .slice(0, 4)
+  }, [reviews, leads, verifiedLots, lotsById])
 
   const featured = useMemo(
     () => [...verifiedLots]
@@ -74,10 +108,10 @@ const ExporterHome = () => {
   )
 
   const STAT_CARDS = [
-    { key: 'verified',      label: 'Lotes verificados', value: stats.verified,      icon: PackageCheck, up: '+24%', to: '/dashboard/exporter/lotes' },
-    { key: 'opportunities', label: 'Oportunidades',     value: stats.opportunities, icon: TrendingUp,   up: '+33%', to: '/dashboard/exporter/oportunidades' },
-    { key: 'orders',        label: 'Órdenes en proceso',value: stats.orders,        icon: Truck,        up: '+12%', to: '/dashboard/exporter/ordenes' },
-    { key: 'volume',        label: 'Volumen neg. (Ton)',value: stats.volume,        icon: BarChart3,    up: '+18%', to: '/dashboard/exporter/reportes' },
+    { key: 'verified',      label: 'Lotes verificados',  value: stats.verified,      icon: PackageCheck, to: '/dashboard/exporter/lotes' },
+    { key: 'opportunities', label: 'Oportunidades',      value: stats.opportunities, icon: TrendingUp,   to: '/dashboard/exporter/oportunidades' },
+    { key: 'orders',        label: 'Órdenes en proceso', value: stats.orders,        icon: Truck,        to: '/dashboard/exporter/ordenes' },
+    { key: 'volume',        label: 'Volumen negociado',  value: stats.volume,        icon: BarChart3,    to: '/dashboard/exporter/reportes' },
   ]
 
   const QUICK = [
@@ -92,16 +126,19 @@ const ExporterHome = () => {
       {/* ── Encabezado ── */}
       <div className="eh-header">
         <h1 className="eh-greeting">¡Bienvenido, {firstName}! <span>👋</span></h1>
-        <p className="eh-sub">Aquí están tus oportunidades de exportación y la actividad reciente.</p>
+        <p className="eh-sub">
+          {exporter?.companyName
+            ? `${exporter.companyName} · oportunidades de exportación y actividad reciente.`
+            : 'Aquí están tus oportunidades de exportación y la actividad reciente.'}
+        </p>
       </div>
 
       {/* ── Stat cards ── */}
       <div className="eh-stats">
-        {STAT_CARDS.map(({ key, label, value, icon: Icon, up, to }) => (
+        {STAT_CARDS.map(({ key, label, value, icon: Icon, to }) => (
           <div key={key} className="eh-stat" onClick={() => navigate(to)}>
             <div className="eh-stat-top">
               <div className="eh-stat-icon"><Icon size={16} strokeWidth={1.8} /></div>
-              <span className="eh-stat-trend">↑ {up}</span>
             </div>
             <span className="eh-stat-label">{label}</span>
             <div className="eh-stat-value">{loading ? '—' : value}</div>
@@ -123,54 +160,55 @@ const ExporterHome = () => {
                 Ver todas <ArrowRight size={12} />
               </button>
             </div>
-            <table className="eh-opps">
-              <thead>
-                <tr>
-                  <th>Producto &amp; cliente</th><th>Volumen</th><th>Estado</th><th>Actualización</th>
-                </tr>
-              </thead>
-              <tbody>
-                {opps.map(o => {
-                  const [label, tone] = LEAD_STATUS[o.leadStatus] || ['Activo', 'gray']
-                  return (
-                    <tr key={o.id} onClick={() => navigate('/dashboard/exporter/oportunidades')}>
-                      <td>
-                        <div className="eh-opp-prod">
-                          <div className="eh-opp-thumb"><Leaf size={15} /></div>
-                          <div>
-                            <span className="eh-opp-name">{o.productName}</span>
-                            <span className="eh-opp-client">{o.company} <em className="eh-opp-cc">{o.cc}</em></span>
+            {opps.length === 0 ? (
+              <p className="eh-empty">{loading ? 'Cargando…' : 'Aún no hay oportunidades activas.'}</p>
+            ) : (
+              <table className="eh-opps">
+                <thead>
+                  <tr>
+                    <th>Producto &amp; cliente</th><th>Volumen</th><th>Estado</th><th>Registro</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {opps.map(o => {
+                    const [label, tone] = LEAD_STATUS[o.leadStatus] || ['Activo', 'gray']
+                    return (
+                      <tr key={o.id} onClick={() => navigate('/dashboard/exporter/oportunidades')}>
+                        <td>
+                          <div className="eh-opp-prod">
+                            <div className="eh-opp-thumb"><Leaf size={15} /></div>
+                            <div>
+                              <span className="eh-opp-name">{o.productName}</span>
+                              <span className="eh-opp-client">{o.buyer} <em className="eh-opp-cc">{o.cc}</em></span>
+                            </div>
                           </div>
-                        </div>
-                      </td>
-                      <td className="eh-opp-vol">{o.qty} {o.unit}</td>
-                      <td><span className={`eh-badge eh-badge--${tone}`}>{label}</span></td>
-                      <td className="eh-opp-when">{o.when}</td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
+                        </td>
+                        <td className="eh-opp-vol">{o.qty} {o.unit}</td>
+                        <td><span className={`eh-badge eh-badge--${tone}`}>{label}</span></td>
+                        <td className="eh-opp-when">{o.when}</td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            )}
           </section>
 
           {/* Lotes destacados */}
-          <div className="eh-featured">
-            {featured.length === 0 ? (
-              <>
-                <FeaturedCard img={cafeTabiImg} name="Café Tabi Variedad Colombia" qty="125" unit="Ton" onExplore={() => navigate('/dashboard/exporter/explorar')} />
-                <FeaturedCard img={cacaoFinoImg} name="Cacao Fino de Aroma" qty="80" unit="Ton" onExplore={() => navigate('/dashboard/exporter/explorar')} />
-              </>
-            ) : featured.map((l, i) => (
-              <FeaturedCard
-                key={l.id}
-                img={i === 0 ? cafeTabiImg : cacaoFinoImg}
-                name={l.productName || l.lotCode}
-                qty={l.availableQuantity}
-                unit={l.unitOfMeasure || 'Ton'}
-                onExplore={() => navigate('/dashboard/exporter/lotes')}
-              />
-            ))}
-          </div>
+          {featured.length > 0 && (
+            <div className="eh-featured">
+              {featured.map(l => (
+                <FeaturedCard
+                  key={l.id}
+                  img={lotImage(l.productName)}
+                  name={l.productName || l.lotCode}
+                  qty={l.availableQuantity}
+                  unit={l.unitOfMeasure || ''}
+                  onExplore={() => navigate('/dashboard/exporter/lotes')}
+                />
+              ))}
+            </div>
+          )}
 
         </div>
 
@@ -197,18 +235,22 @@ const ExporterHome = () => {
           {/* Actividad reciente */}
           <section className="eh-card">
             <h2 className="eh-card-title">Actividad reciente</h2>
-            <ul className="eh-activity">
-              {ACTIVITY.map((a, i) => (
-                <li key={i}>
-                  <span className={`eh-act-dot eh-act-dot--${a.dot}`} />
-                  <div className="eh-act-body">
-                    <span className="eh-act-title">{a.title}</span>
-                    <span className="eh-act-text">{a.text}</span>
-                    <span className="eh-act-when">{a.when}</span>
-                  </div>
-                </li>
-              ))}
-            </ul>
+            {activity.length === 0 ? (
+              <p className="eh-empty">Sin actividad reciente.</p>
+            ) : (
+              <ul className="eh-activity">
+                {activity.map((a, i) => (
+                  <li key={i}>
+                    <span className={`eh-act-dot eh-act-dot--${a.dot}`} />
+                    <div className="eh-act-body">
+                      <span className="eh-act-title">{a.title}</span>
+                      <span className="eh-act-text">{a.text}</span>
+                      <span className="eh-act-when">{fmtWhen(a.ts)}</span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
           </section>
 
           {/* Expande tus mercados */}

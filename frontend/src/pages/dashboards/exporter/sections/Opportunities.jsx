@@ -18,7 +18,7 @@ function fmt(iso) {
 }
 
 const Opportunities = () => {
-  const { leads, loading, error, refresh } = useExporterData()
+  const { leads, lotsById, loading, error, refresh } = useExporterData()
   const [updatingId, setUpdatingId] = useState(null)
 
   const changeStatus = async (lead, newStatus) => {
@@ -58,19 +58,21 @@ const Opportunities = () => {
           <table className="esec-table">
             <thead>
               <tr>
-                <th>Producto</th><th>Comprador</th><th>Volumen</th>
-                <th>Actualización</th><th>Estado</th>
+                <th>Producto</th><th>Comprador</th><th>Destino</th><th>Volumen</th>
+                <th>Registro</th><th>Estado</th>
               </tr>
             </thead>
             <tbody>
               {leads.map(lead => {
+                const lot = lotsById.get(lead.lotId)
                 const [, tone] = STATUS[lead.leadStatus] || ['', 'gray']
                 return (
                   <tr key={lead.id}>
-                    <td>{lead.productName || lead.lotProductName || '—'}</td>
-                    <td>{lead.buyerCompany || lead.companyName || lead.buyerName || '—'}</td>
-                    <td>{lead.quantity ?? lead.volume ?? '—'} {lead.unitOfMeasure || ''}</td>
-                    <td>{fmt(lead.updatedAt || lead.createdAt)}</td>
+                    <td>{lot?.productName || lead.lotCode || '—'}</td>
+                    <td>{lead.buyerName || '—'}</td>
+                    <td>{lead.destinationCountry || '—'}</td>
+                    <td>{lead.requestedQuantity ?? '—'} {lead.unitOfMeasure || ''}</td>
+                    <td>{fmt(lead.createdAt)}</td>
                     <td>
                       <select
                         className="esec-status-select"
