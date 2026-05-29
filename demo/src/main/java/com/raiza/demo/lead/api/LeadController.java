@@ -12,6 +12,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import com.raiza.demo.security.model.UserPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -31,12 +33,15 @@ public class LeadController {
     // ── Leads ─────────────────────────────────────────────────────────────
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'EXPORTER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EXPORTER', 'PRODUCER')")
     public ResponseEntity<ApiResponse<List<LeadResponse>>> findAll(
             @RequestParam(required = false) LeadStatus status,
-            @RequestParam(required = false) Long lotId) {
+            @RequestParam(required = false) Long lotId,
+            @AuthenticationPrincipal UserPrincipal principal) {
         List<LeadResponse> result;
-        if (status != null) {
+        if (principal.getUser().getRole().name().equals("PRODUCER")) {
+            result = leadService.findByProducer(principal.getUser().getProfileId());
+        } else if (status != null) {
             result = leadService.findByStatus(status);
         } else if (lotId != null) {
             result = leadService.findByLot(lotId);
@@ -47,13 +52,13 @@ public class LeadController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'EXPORTER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EXPORTER', 'PRODUCER')")
     public ResponseEntity<ApiResponse<LeadResponse>> findById(@PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.ok(leadService.findById(id)));
     }
 
     @PatchMapping("/{id}/status")
-    @PreAuthorize("hasAnyRole('ADMIN', 'EXPORTER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EXPORTER', 'PRODUCER')")
     public ResponseEntity<ApiResponse<LeadResponse>> updateStatus(
             @PathVariable Long id,
             @RequestBody @Valid UpdateLeadStatusRequest req) {
