@@ -29,6 +29,10 @@ INSERT INTO lot_certification (id, lot_id, certification_id, certificate_code, v
 VALUES (1, 1, 1, 'FT-2026-001', '2026-01-01', '2027-01-01', 'VALIDATED', NOW(), NOW()),
        (2, 1, 2, 'RA-2026-001', '2026-01-01', '2027-01-01', 'VALIDATED', NOW(), NOW());
 
+-- Certification Application  (solicitud histórica aprobada del lote 1)
+INSERT INTO certification_application (id, application_code, producer_id, farm_id, lot_id, certification_id, status, payload_json, recommended_by_ai, review_notes, reviewed_by, created_at, updated_at)
+VALUES (1, 'CERT-APP-001', 1, 1, 1, 1, 'APPROVED', '{"certifier":"FAIRTRADE","lotCode":"CAF-MINCA-001"}', true, 'Documentación verificada', 1, NOW(), NOW());
+
 -- Trace Events
 INSERT INTO trace_event (id, lot_id, event_type, event_timestamp, actor_type, actor_id, title, description, latitude, longitude, metric_name, metric_value, metric_unit, hash_value, previous_hash, created_at)
 VALUES (1, 1, 'LOT_CREATED', '2026-05-15T08:00:00', 'PRODUCER', 1, 'Lote registrado', 'Se registró el lote de café pergamino seco', 11.1445, -74.1202, NULL, NULL, NULL, 'abc123def', NULL, NOW()),
@@ -63,11 +67,7 @@ VALUES (1, 'Exportadores del Magdalena', 'ExportMagdalena SAS', 'EXP-001', 'Mar�
 INSERT INTO export_review (id, lead_id, exporter_id, review_status, notes, incoterm, created_at, updated_at)
 VALUES (1, 1, 1, 'PENDING_REVIEW', 'Revisar disponibilidad y documentación del lote', 'FOB', NOW(), NOW());
 
-<<<<<<< HEAD
--- App User
-=======
 -- App User  (onboarding_completed es NOT NULL)
->>>>>>> origin/backend
 INSERT INTO app_user (id, name, email, password, role, active, onboarding_completed, created_at, updated_at)
 VALUES (1, 'Admin Magdalena', 'admin@magdalena.co', '$2a$10$dummy_hash_for_testing', 'ADMIN', true, true, NOW(), NOW());
 
@@ -78,6 +78,7 @@ ALTER SEQUENCE producer_id_seq RESTART WITH 100;
 ALTER SEQUENCE farm_id_seq RESTART WITH 100;
 ALTER SEQUENCE product_lot_id_seq RESTART WITH 100;
 ALTER SEQUENCE lot_certification_id_seq RESTART WITH 100;
+ALTER SEQUENCE certification_application_id_seq RESTART WITH 100;
 ALTER SEQUENCE trace_event_id_seq RESTART WITH 100;
 ALTER SEQUENCE tourism_operator_id_seq RESTART WITH 100;
 ALTER SEQUENCE tourism_experience_id_seq RESTART WITH 100;
