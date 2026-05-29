@@ -33,4 +33,17 @@ public class Exporter extends BaseEntity {
 
     @Column(length = 80)
     private String municipality;
+
+    // ── Respuestas del onboarding ─────────────────────────────────────────
+    // Mercados a los que exporta (lista separada por comas: EUROPA,ASIA,...)
+    @Column(length = 255)
+    private String markets;
+
+    // Productos que maneja (lista separada por comas: CAFE,CACAO,...)
+    @Column(name = "handled_products", length = 255)
+    private String handledProducts;
+
+    // Rango de volumen mensual en toneladas
+    @Column(name = "monthly_volume_range", length = 40)
+    private String monthlyVolumeRange;
 }

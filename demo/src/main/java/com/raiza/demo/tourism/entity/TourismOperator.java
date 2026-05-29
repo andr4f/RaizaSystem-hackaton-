@@ -33,4 +33,17 @@ public class TourismOperator extends BaseEntity {
 
     @Column(length = 200)
     private String website;
+
+    // ── Respuestas del onboarding ─────────────────────────────────────────
+    // Tipos de experiencia que ofrece (lista separada por comas: TOUR_FINCA,CATA,...)
+    @Column(name = "experience_types", length = 255)
+    private String experienceTypes;
+
+    // ¿Trabaja con productores locales? YES / NO / STARTING
+    @Column(name = "works_with_local_producers", length = 20)
+    private String worksWithLocalProducers;
+
+    // Rango estimado de visitantes al mes
+    @Column(name = "monthly_visitors_range", length = 40)
+    private String monthlyVisitorsRange;
 }

@@ -5,6 +5,7 @@ public record ProductResponse(
         String name,
         String category,
         String unitOfMeasure,
-        String description
+        String description,
+        boolean featured
 ) {
 }

@@ -41,4 +41,13 @@ public class Producer extends BaseEntity {
 
     @Column(name = "community_name", length = 120)
     private String communityName;
+
+    // ── Respuestas del onboarding ─────────────────────────────────────────
+    // Producto principal que cultiva (café / banano / cacao / otro)
+    @Column(name = "main_product", length = 50)
+    private String mainProduct;
+
+    // Conocimiento sobre certificaciones: HAS / NONE / UNKNOWN
+    @Column(name = "certification_awareness", length = 20)
+    private String certificationAwareness;
 }

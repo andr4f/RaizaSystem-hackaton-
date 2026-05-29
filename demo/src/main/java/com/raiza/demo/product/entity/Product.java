@@ -24,4 +24,8 @@ public class Product extends BaseEntity {
 
     @Column(columnDefinition = "text")
     private String description;
+
+    // Productos destacados del onboarding (café, banano, cacao)
+    @Column(nullable = false)
+    private boolean featured = false;
 }

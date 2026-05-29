@@ -14,6 +14,9 @@ public record CreateProducerRequest(
         @Size(max = 120) String email,
         @NotBlank @Size(max = 80) String municipality,
         @Size(max = 80) String department,
-        @Size(max = 120) String communityName
+        @Size(max = 120) String communityName,
+        // Respuestas del onboarding
+        @Size(max = 50) String mainProduct,
+        @Size(max = 20) String certificationAwareness
 ) {
 }

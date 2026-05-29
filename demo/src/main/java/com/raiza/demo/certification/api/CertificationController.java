@@ -40,14 +40,13 @@ public class CertificationController {
         return ResponseEntity.created(location).body(ApiResponse.created(created));
     }
 
+    // Público — catálogo usado en el onboarding del productor
     @GetMapping("/api/v1/certifications")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<List<CertificationResponse>>> findAll() {
         return ResponseEntity.ok(ApiResponse.ok(certificationService.findAll()));
     }
 
     @GetMapping("/api/v1/certifications/{id}")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<CertificationResponse>> findById(@PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.ok(certificationService.findById(id)));
     }
