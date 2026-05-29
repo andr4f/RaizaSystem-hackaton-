@@ -8,7 +8,7 @@ COPY pom.xml .
 RUN chmod +x mvnw && ./mvnw dependency:go-offline -B
 
 COPY src src
-RUN ./mvnw package -DskipTests -B
+RUN ./mvnw package -Dmaven.test.skip=true -B
 
 # ── Run ──
 FROM eclipse-temurin:21-jre-alpine
