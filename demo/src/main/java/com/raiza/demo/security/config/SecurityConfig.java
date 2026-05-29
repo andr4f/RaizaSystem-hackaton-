@@ -50,6 +50,7 @@ public class SecurityConfig {
                 // Rutas públicas — sin autenticación
                 .requestMatchers("/public/**").permitAll()
                 .requestMatchers("/api/v1/auth/**").permitAll()
+                .requestMatchers("/api/v1/chat/**").permitAll()
                 .requestMatchers("/actuator/health").permitAll()
                 // Todo lo demás requiere JWT válido
                 .anyRequest().authenticated()
