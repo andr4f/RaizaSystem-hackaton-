@@ -280,3 +280,32 @@
     color: #9ca3af;
     margin-top: 14px;
 }
+
+@media (max-width: 768px) {
+    .login-page {
+        padding: 16px;
+        align-items: flex-start;
+    }
+
+    .contianer-login {
+        flex-direction: column;
+        min-height: unset;
+        max-width: 480px;
+    }
+
+    .container-img-login {
+        width: 100%;
+        height: 200px;
+    }
+
+    .container-form-login {
+        width: 100%;
+        padding: 32px 24px;
+    }
+
+    .remember-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+}

@@ -179,5 +179,11 @@
   .eh-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 640px) {
+  .eh { max-width: 100%; min-width: 0; overflow-x: hidden; }
+  .eh-greeting { font-size: 20px; word-break: break-word; }
   .eh-stats, .eh-featured { grid-template-columns: 1fr; }
+  .eh-card { padding: 16px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .eh-card-head { flex-wrap: wrap; gap: 8px; }
+  .eh-opps { min-width: 520px; }
+  .eh-opp-name { word-break: break-word; }
 }

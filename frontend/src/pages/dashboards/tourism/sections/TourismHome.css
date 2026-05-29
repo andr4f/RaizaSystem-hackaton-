@@ -141,5 +141,24 @@
   .th-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 640px) {
+  .th { max-width: 100%; min-width: 0; overflow-x: hidden; }
+  .th-greeting { font-size: 20px; word-break: break-word; }
   .th-stats { grid-template-columns: 1fr; }
+  .th-card { padding: 16px; }
+  .th-card-head { flex-wrap: wrap; gap: 8px; }
+  .th-exp {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 10px 14px;
+  }
+  .th-exp-body { flex: 1 1 calc(100% - 78px); min-width: 0; }
+  .th-exp-name { word-break: break-word; }
+  .th-exp-side {
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 78px;
+  }
+  .th-exp-when { white-space: normal; text-align: right; }
 }

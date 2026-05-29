@@ -1,7 +1,8 @@
+import { useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import {
   Home, Package, Route, BadgeCheck, QrCode,
-  Users, BarChart3, Wallet, MapPin, Bell, ChevronDown, LogOut,
+  Users, BarChart3, Wallet, MapPin, Bell, ChevronDown, LogOut, Menu,
 } from 'lucide-react'
 import { useAuth } from '../../../app/providers/AuthContext'
 import { useProducerData } from './useProducerData'
@@ -23,6 +24,7 @@ const ProducerLayout = () => {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const { lots, producer, stats } = useProducerData()
+  const [menuOpen, setMenuOpen] = useState(false)
 
   const activeLots = stats?.activeLots ?? lots.filter(l => ['AVAILABLE', 'CERTIFICATION_PENDING', 'RESERVED'].includes(l.status)).length
   const qrScans = stats?.qrScansThisMonth ?? stats?.qrScans ?? 0
@@ -31,12 +33,22 @@ const ProducerLayout = () => {
     : 'Sierra Nevada de Santa Marta'
 
   const handleLogout = () => { logout(); navigate('/login') }
+  const closeMenu = () => setMenuOpen(false)
 
   return (
     <div className="pl-shell">
 
+      {menuOpen && (
+        <button
+          type="button"
+          className="pl-sidebar-backdrop pl-sidebar-backdrop--visible"
+          onClick={closeMenu}
+          aria-label="Cerrar menú"
+        />
+      )}
+
       {/* ── Sidebar ── */}
-      <aside className="pl-sidebar">
+      <aside className={`pl-sidebar${menuOpen ? ' pl-sidebar--open' : ''}`}>
         <div className="pl-brand">
           <img src="/logo-nombre.svg" alt="Raíza" className="pl-logo" />
           <span className="pl-tagline">Traza lo que nos conecta</span>
@@ -48,6 +60,7 @@ const ProducerLayout = () => {
               key={to}
               to={to}
               end={end}
+              onClick={closeMenu}
               className={({ isActive }) => `pl-nav-item${isActive ? ' active' : ''}`}
             >
               <Icon size={18} strokeWidth={1.8} />
@@ -82,6 +95,15 @@ const ProducerLayout = () => {
       {/* ── Main ── */}
       <div className="pl-main">
         <header className="pl-topbar">
+          <button
+            type="button"
+            className="pl-menu-btn"
+            onClick={() => setMenuOpen(o => !o)}
+            aria-label="Abrir menú"
+            aria-expanded={menuOpen}
+          >
+            <Menu size={20} strokeWidth={2} />
+          </button>
           <div className="pl-location">
             <MapPin size={14} strokeWidth={2} />
             <span>{location}</span>

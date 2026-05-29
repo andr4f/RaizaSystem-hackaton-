@@ -1,7 +1,8 @@
+import { useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import {
   Home, Search, PackageCheck, BadgeCheck, TrendingUp,
-  Users, Truck, BarChart3, Wallet, MapPin, Bell, ChevronDown, LogOut, Settings,
+  Users, Truck, BarChart3, Wallet, MapPin, Bell, ChevronDown, LogOut, Settings, Menu,
 } from 'lucide-react'
 import { useAuth } from '../../../app/providers/AuthContext'
 import { useExporterData } from './useExporterData'
@@ -23,16 +24,27 @@ const ExporterLayout = () => {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const { verifiedLots, leads } = useExporterData()
+  const [menuOpen, setMenuOpen] = useState(false)
 
   const newLeads = leads.filter(l => ['NEW', 'CONTACTED'].includes(l.leadStatus)).length
 
   const handleLogout = () => { logout(); navigate('/login') }
+  const closeMenu = () => setMenuOpen(false)
 
   return (
     <div className="el-shell">
 
+      {menuOpen && (
+        <button
+          type="button"
+          className="el-sidebar-backdrop el-sidebar-backdrop--visible"
+          onClick={closeMenu}
+          aria-label="Cerrar menú"
+        />
+      )}
+
       {/* ── Sidebar ── */}
-      <aside className="el-sidebar">
+      <aside className={`el-sidebar${menuOpen ? ' el-sidebar--open' : ''}`}>
         <div className="el-brand">
           <img src="/logo-nombre.svg" alt="Raíza" className="el-logo" />
           <span className="el-tagline">Traza lo que nos conecta</span>
@@ -44,6 +56,7 @@ const ExporterLayout = () => {
               key={to}
               to={to}
               end={end}
+              onClick={closeMenu}
               className={({ isActive }) => `el-nav-item${isActive ? ' active' : ''}`}
             >
               <Icon size={18} strokeWidth={1.8} />
@@ -72,6 +85,15 @@ const ExporterLayout = () => {
       {/* ── Main ── */}
       <div className="el-main">
         <header className="el-topbar">
+          <button
+            type="button"
+            className="el-menu-btn"
+            onClick={() => setMenuOpen(o => !o)}
+            aria-label="Abrir menú"
+            aria-expanded={menuOpen}
+          >
+            <Menu size={20} strokeWidth={2} />
+          </button>
           <div className="el-location">
             <MapPin size={14} strokeWidth={2} />
             <span>Sierra Nevada de Santa Marta</span>

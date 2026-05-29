@@ -173,8 +173,76 @@
 .el-content { padding: 28px 32px 40px; }
 
 /* ══════════ RESPONSIVE ══════════ */
+.el-menu-btn,
+.el-sidebar-backdrop { display: none; }
+
 @media (max-width: 900px) {
-  .el-sidebar { display: none; }
-  .el-content { padding: 20px; }
-  .el-topbar { padding: 12px 20px; }
+  .el-shell { overflow-x: hidden; }
+
+  .el-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 200;
+    height: 100vh;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    box-shadow: 8px 0 32px rgba(13, 31, 15, 0.12);
+  }
+
+  .el-sidebar.el-sidebar--open { transform: translateX(0); }
+
+  .el-sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 199;
+    border: none;
+    padding: 0;
+    background: rgba(13, 31, 15, 0.45);
+    cursor: pointer;
+  }
+
+  .el-menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border: 1px solid var(--el-gray-200);
+    border-radius: 10px;
+    background: #fff;
+    color: var(--el-gray-600);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .el-topbar {
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .el-location {
+    max-width: calc(100% - 52px);
+    overflow: hidden;
+  }
+
+  .el-location span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .el-topbar-right { gap: 8px; margin-left: auto; }
+
+  .el-user-info,
+  .el-user-chev { display: none; }
+
+  .el-content { padding: 16px; }
+  .el-topbar { padding: 12px 16px; }
+}
+
+@media (max-width: 480px) {
+  .el-location { display: none; }
 }

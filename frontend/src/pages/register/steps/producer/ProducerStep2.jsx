@@ -1,34 +1,61 @@
-import { useState, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Search, MapPin } from 'lucide-react'
-import mountainImg from '../../../../assets/imagen-prductor-segundo-modulo.png'
-import bananoImg   from '../../../../assets/banano-harton.webp'
-import cacaoImg    from '../../../../assets/imagen-cacao-fino.jpg'
-import cafeImg     from '../../../../assets/imagen-cafe-tabi.png'
-import fundImg     from '../../../../assets/imagen-prductor-modulo-3.jpg'
-import sideImg     from '../../../../assets/imagen-prductor-modulo-3.jpg'
+import { Search, MapPin, Loader2 } from 'lucide-react'
+import { municipalityApi } from '../../../../shared/api/municipalityApi'
+import sideImg from '../../../../assets/imagen-prductor-modulo-3.jpg'
 import './ProducerStep2.css'
 
-const MUNICIPALITIES = [
-  { value: 'santa_marta', label: 'Santa Marta', img: mountainImg },
-  { value: 'banano',      label: 'Banano',       img: bananoImg  },
-  { value: 'cienaga',     label: 'Ciénaga',      img: cacaoImg   },
-  { value: 'aracataca',   label: 'Aracataca',    img: cafeImg    },
-  { value: 'fundacion',   label: 'Fundación',    img: fundImg    },
-  { value: 'otro',        label: 'Otro municipio', img: null     },
-]
-
 const TOTAL_STEPS = 3
+const DEPARTMENT = 'Magdalena'
 
 const ProducerStep2 = ({ onNext, onBack, currentStep = 2 }) => {
-  const [selected, setSelected] = useState('banano')
-  const [search, setSearch]     = useState('')
+  const [municipalities, setMunicipalities] = useState([])
+  const [selectedId, setSelectedId] = useState(null)
+  const [search, setSearch] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const navigate = useNavigate()
 
-  const filtered = useMemo(() =>
-    MUNICIPALITIES.filter(m =>
-      m.label.toLowerCase().includes(search.toLowerCase())
-    ), [search])
+  useEffect(() => {
+    let cancelled = false
+
+    municipalityApi
+      .list({ department: DEPARTMENT })
+      .then(res => {
+        if (cancelled) return
+        const list = res?.data ?? []
+        setMunicipalities(list)
+        if (list.length > 0) setSelectedId(list[0].id)
+      })
+      .catch(err => {
+        if (!cancelled) setError(err.message || 'No se pudieron cargar los municipios')
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+
+    return () => { cancelled = true }
+  }, [])
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    if (!q) return municipalities
+    return municipalities.filter(m =>
+      m.name.toLowerCase().includes(q) ||
+      (m.subregion && m.subregion.toLowerCase().includes(q))
+    )
+  }, [municipalities, search])
+
+  const selected = municipalities.find(m => m.id === selectedId)
+
+  const handleContinue = () => {
+    if (!selected) return
+    onNext({
+      municipality: selected.name,
+      department: selected.department,
+      municipalityId: selected.id,
+    })
+  }
 
   return (
     <div className="ps2-page">
@@ -85,34 +112,53 @@ const ProducerStep2 = ({ onNext, onBack, currentStep = 2 }) => {
                 placeholder="Buscar municipio..."
                 value={search}
                 onChange={e => setSearch(e.target.value)}
+                disabled={loading}
               />
             </div>
 
-            <span className="ps2-list-label">Municipios principales</span>
+            <span className="ps2-list-label">
+              Municipios habilitados en {DEPARTMENT}
+              {!loading && municipalities.length > 0 && ` (${filtered.length})`}
+            </span>
+
+            {loading && (
+              <p className="ps2-status">
+                <Loader2 size={16} className="ps2-spin" /> Cargando municipios…
+              </p>
+            )}
+
+            {error && <p className="ps2-status ps2-status--error">{error}</p>}
+
+            {!loading && !error && filtered.length === 0 && (
+              <p className="ps2-status">No se encontraron municipios para tu búsqueda.</p>
+            )}
 
             {/* Grid municipios */}
-            <div className="ps2-grid">
-              {filtered.map(({ value, label, img }) => (
-                <button
-                  key={value}
-                  className={`ps2-item${selected === value ? ' selected' : ''}`}
-                  onClick={() => setSelected(value)}
-                >
-                  {/* Thumbnail */}
-                  <div className="ps2-item-thumb">
-                    {img
-                      ? <img src={img} alt={label} className="ps2-item-img" />
-                      : <MapPin size={16} className="ps2-item-icon" />
-                    }
-                  </div>
+            {!loading && !error && (
+              <div className="ps2-grid">
+                {filtered.map(m => (
+                  <button
+                    key={m.id}
+                    type="button"
+                    className={`ps2-item${selectedId === m.id ? ' selected' : ''}`}
+                    onClick={() => setSelectedId(m.id)}
+                  >
+                    <div className="ps2-item-thumb">
+                      <MapPin size={16} className="ps2-item-icon" />
+                    </div>
 
-                  <span className="ps2-item-label">{label}</span>
+                    <div className="ps2-item-text">
+                      <span className="ps2-item-label">{m.name}</span>
+                      {m.subregion && (
+                        <span className="ps2-item-meta">{m.subregion}</span>
+                      )}
+                    </div>
 
-                  {/* Radio */}
-                  <div className={`ps2-radio${selected === value ? ' selected' : ''}`} />
-                </button>
-              ))}
-            </div>
+                    <div className={`ps2-radio${selectedId === m.id ? ' selected' : ''}`} />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
         </div>
@@ -128,7 +174,11 @@ const ProducerStep2 = ({ onNext, onBack, currentStep = 2 }) => {
 
       {/* ── Continuar (centrado abajo) ── */}
       <div className="ps2-footer">
-        <button className="ps2-btn" onClick={() => onNext({ municipality: selected })}>
+        <button
+          className="ps2-btn"
+          onClick={handleContinue}
+          disabled={!selected || loading}
+        >
           Continuar →
         </button>
       </div>

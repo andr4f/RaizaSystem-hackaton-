@@ -30,6 +30,7 @@ const LinkedinIcon = () => (
 )
 import heroImg from './assets/imagen-hero.png'
 import communityImg from './assets/imagen-login.png'
+import LandingChatWidget from './components/LandingChatWidget'
 import './Landing.css'
 
 const Landing = () => {
@@ -474,6 +475,7 @@ const Landing = () => {
         </div>
       </footer>
 
+      <LandingChatWidget />
     </div>
   )
 }

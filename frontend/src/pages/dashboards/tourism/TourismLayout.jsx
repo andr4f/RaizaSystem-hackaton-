@@ -1,7 +1,8 @@
+import { useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import {
   Home, Compass, Users, QrCode, CalendarCheck,
-  Inbox, BarChart3, Wallet, Settings, MapPin, Bell, ChevronDown, LogOut,
+  Inbox, BarChart3, Wallet, Settings, MapPin, Bell, ChevronDown, LogOut, Menu,
 } from 'lucide-react'
 import { useAuth } from '../../../app/providers/AuthContext'
 import { useTourismData } from './useTourismData'
@@ -23,6 +24,7 @@ const TourismLayout = () => {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const { operator, experiences, stats } = useTourismData()
+  const [menuOpen, setMenuOpen] = useState(false)
 
   const visits = stats?.visitsThisMonth ?? stats?.visits ?? 0
 
@@ -31,12 +33,22 @@ const TourismLayout = () => {
     : 'Sierra Nevada de Santa Marta'
 
   const handleLogout = () => { logout(); navigate('/login') }
+  const closeMenu = () => setMenuOpen(false)
 
   return (
     <div className="tl-shell">
 
+      {menuOpen && (
+        <button
+          type="button"
+          className="tl-sidebar-backdrop tl-sidebar-backdrop--visible"
+          onClick={closeMenu}
+          aria-label="Cerrar menú"
+        />
+      )}
+
       {/* ── Sidebar ── */}
-      <aside className="tl-sidebar">
+      <aside className={`tl-sidebar${menuOpen ? ' tl-sidebar--open' : ''}`}>
         <div className="tl-brand">
           <img src="/logo-nombre.svg" alt="Raíza" className="tl-logo" />
           <span className="tl-tagline">Traza lo que nos conecta</span>
@@ -48,6 +60,7 @@ const TourismLayout = () => {
               key={to}
               to={to}
               end={end}
+              onClick={closeMenu}
               className={({ isActive }) => `tl-nav-item${isActive ? ' active' : ''}`}
             >
               <Icon size={18} strokeWidth={1.8} />
@@ -84,6 +97,15 @@ const TourismLayout = () => {
       {/* ── Main ── */}
       <div className="tl-main">
         <header className="tl-topbar">
+          <button
+            type="button"
+            className="tl-menu-btn"
+            onClick={() => setMenuOpen(o => !o)}
+            aria-label="Abrir menú"
+            aria-expanded={menuOpen}
+          >
+            <Menu size={20} strokeWidth={2} />
+          </button>
           <div className="tl-location">
             <MapPin size={14} strokeWidth={2} />
             <span>{location}</span>

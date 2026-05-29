@@ -86,11 +86,14 @@
   display: flex; align-items: center; justify-content: center;
 }
 .ph-lot-info { flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-.ph-lot-name { font-size: 13.5px; font-weight: 600; color: var(--c-gray-900); display: flex; align-items: center; gap: 8px; }
-.ph-lot-meta { font-size: 12px; color: var(--c-gray-400); }
-.ph-lot-date { font-size: 11.5px; color: var(--c-gray-400); white-space: nowrap; }
+.ph-lot-name {
+  font-size: 13.5px; font-weight: 600; color: var(--c-gray-900);
+  display: flex; align-items: center; flex-wrap: wrap; gap: 6px 8px; min-width: 0;
+}
+.ph-lot-meta { font-size: 12px; color: var(--c-gray-400); word-break: break-word; }
+.ph-lot-date { font-size: 11.5px; color: var(--c-gray-400); white-space: nowrap; flex-shrink: 0; }
 
-.ph-badge { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
+.ph-badge { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 20px; flex-shrink: 0; }
 .ph-badge--available { background: #dcfce7; color: #15803d; }
 .ph-badge--certification_pending, .ph-badge--in_export_review { background: var(--c-amber-50); color: var(--c-amber); }
 .ph-badge--reserved { background: #dbeafe; color: #1d4ed8; }
@@ -98,9 +101,10 @@
 
 /* Chart */
 .ph-chart-note { font-size: 11px; color: var(--c-gray-400); }
-.ph-chart-period { font-size: 12px; color: var(--c-gray-500); border: 1px solid var(--c-gray-200); border-radius: 8px; padding: 5px 10px; }
+.ph-chart-period { font-size: 12px; color: var(--c-gray-500); border: 1px solid var(--c-gray-200); border-radius: 8px; padding: 5px 10px; flex-shrink: 0; }
 .ph-chart-value { font-size: 30px; font-weight: 700; color: var(--c-gray-900); margin-bottom: 8px; }
 .ph-chart-up { font-size: 13px; color: var(--c-green-500); font-weight: 600; }
+.ph-chart { width: 100%; min-width: 0; overflow: hidden; }
 
 /* Completa perfil */
 .ph-profile { display: flex; flex-direction: column; gap: 12px; }
@@ -176,5 +180,24 @@
   .ph-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 640px) {
+  .ph { max-width: 100%; min-width: 0; overflow-x: hidden; }
+  .ph-greeting { font-size: 20px; word-break: break-word; }
   .ph-stats, .ph-recs { grid-template-columns: 1fr; }
+  .ph-card { padding: 16px; }
+  .ph-card-head { flex-wrap: wrap; gap: 8px; align-items: center; }
+  .ph-lot {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 8px 12px;
+  }
+  .ph-lot-info { flex: 1 1 calc(100% - 54px); min-width: 0; }
+  .ph-lot-date {
+    width: 100%;
+    padding-left: 54px;
+    white-space: normal;
+    flex-shrink: 1;
+  }
+  .ph-chart-value { font-size: 26px; }
+  .ph-chart-period { font-size: 11px; padding: 4px 8px; }
+  .ph-chart { overflow: hidden; margin-right: -4px; }
 }

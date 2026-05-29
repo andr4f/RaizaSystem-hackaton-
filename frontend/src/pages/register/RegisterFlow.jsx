@@ -10,6 +10,7 @@ import ExporterStep1  from './steps/exporter/ExporterStep1'
 import ExporterStep2  from './steps/exporter/ExporterStep2'
 import ExporterStep3  from './steps/exporter/ExporterStep3'
 import Register       from '../../auth/Register'
+import './register-responsive.css'
 
 const RegisterFlow = () => {
   const [step, setStep]         = useState(0)
