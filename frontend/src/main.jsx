@@ -27,6 +27,16 @@ import Orders from './pages/dashboards/exporter/sections/Orders.jsx'
 import ExporterReports from './pages/dashboards/exporter/sections/ExporterReports.jsx'
 import ExporterFinance from './pages/dashboards/exporter/sections/ExporterFinance.jsx'
 import TourismDashboard from './pages/dashboards/tourism/TourismDashboard.jsx'
+import TourismHome from './pages/dashboards/tourism/sections/TourismHome.jsx'
+import Experiences from './pages/dashboards/tourism/sections/Experiences.jsx'
+import NewExperience from './pages/dashboards/tourism/sections/NewExperience.jsx'
+import ExperienceDetail from './pages/dashboards/tourism/sections/ExperienceDetail.jsx'
+import AlliedProducers from './pages/dashboards/tourism/sections/AlliedProducers.jsx'
+import TourismQr from './pages/dashboards/tourism/sections/TourismQr.jsx'
+import Bookings from './pages/dashboards/tourism/sections/Bookings.jsx'
+import TourismLeads from './pages/dashboards/tourism/sections/TourismLeads.jsx'
+import TourismReports from './pages/dashboards/tourism/sections/TourismReports.jsx'
+import TourismFinance from './pages/dashboards/tourism/sections/TourismFinance.jsx'
 import RegisterFlow from './pages/register/RegisterFlow.jsx'
 
 const router = createBrowserRouter([
@@ -87,6 +97,18 @@ const router = createBrowserRouter([
         <TourismDashboard />
       </ProtectedRoute>
     ),
+    children: [
+      { index: true, element: <TourismHome /> },
+      { path: 'experiencias', element: <Experiences /> },
+      { path: 'experiencias/nueva', element: <NewExperience /> },
+      { path: 'experiencias/:experienceId', element: <ExperienceDetail /> },
+      { path: 'aliados', element: <AlliedProducers /> },
+      { path: 'qr', element: <TourismQr /> },
+      { path: 'reservas', element: <Bookings /> },
+      { path: 'leads', element: <TourismLeads /> },
+      { path: 'reportes', element: <TourismReports /> },
+      { path: 'finanzas', element: <TourismFinance /> },
+    ],
   },
 ])
 
