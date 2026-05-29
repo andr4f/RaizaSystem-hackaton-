@@ -2,6 +2,7 @@ package com.raiza.demo.chat.service;
 
 import com.raiza.demo.chat.dto.ChatRequest;
 import com.raiza.demo.chat.dto.ChatResponse;
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -74,11 +75,22 @@ public class ChatService {
     public ChatService(@Value("${groq.api.url}") String apiUrl,
                        @Value("${groq.api.key}") String apiKey,
                        @Value("${groq.model}") String model) {
-        this.apiKey = apiKey;
+        this.apiKey = apiKey != null ? apiKey.trim() : "";
         this.model = model;
         this.restClient = RestClient.builder()
                 .baseUrl(apiUrl)
                 .build();
+    }
+
+    @PostConstruct
+    void logGroqKeyStatus() {
+        if (apiKey.isBlank()) {
+            log.warn("Groq API key NO configurada — define GROQ_API_KEY en Railway (servicio backend)");
+        } else if (!apiKey.startsWith("gsk_")) {
+            log.warn("Groq API key inválida (debe empezar con gsk_) — longitud={}", apiKey.length());
+        } else {
+            log.info("Groq API key cargada correctamente (longitud={})", apiKey.length());
+        }
     }
 
     public ChatResponse ask(ChatRequest request) {
@@ -113,6 +125,9 @@ public class ChatService {
 
         } catch (RestClientException e) {
             log.error("Groq API error: {}", e.getMessage(), e);
+            if (apiKey.isBlank() || !apiKey.startsWith("gsk_")) {
+                return new ChatResponse("El asistente no está configurado en el servidor. Contacta al administrador.");
+            }
             return new ChatResponse("Error al conectar con el asistente: " + e.getMessage());
         }
     }
