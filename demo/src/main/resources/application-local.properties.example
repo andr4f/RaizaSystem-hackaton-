@@ -1,3 +1,5 @@
 # Copia este archivo como application-local.properties (está en .gitignore)
 # o define la variable de entorno GROQ_API_KEY.
 groq.api.key=pon-tu-groq-key-aqui
+
+# Producción (Railway): ver railway.env.example en la raíz del repo.

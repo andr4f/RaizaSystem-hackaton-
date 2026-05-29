@@ -1,0 +1,8 @@
+target/
+.git/
+.gitignore
+*.md
+generated-pdfs/
+src/main/resources/application-local.properties
+.env
+.env.*
