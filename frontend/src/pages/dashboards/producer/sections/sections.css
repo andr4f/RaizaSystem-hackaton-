@@ -57,6 +57,20 @@
 .sec-table tbody tr:hover { background: #fafafa; }
 .sec-mono { font-family: ui-monospace, monospace; font-size: 12.5px; color: var(--s-gray-500); }
 
+/* Select de estado editable (leads) */
+.sec-status-select {
+  padding: 6px 10px;
+  border: 1.5px solid var(--s-gray-200);
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-family: inherit;
+  color: var(--s-gray-900);
+  background: #fff;
+  cursor: pointer;
+}
+.sec-status-select:focus { outline: none; border-color: var(--s-green-500); }
+.sec-status-select:disabled { opacity: 0.5; cursor: wait; }
+
 /* Badge */
 .sec-badge { font-size: 10.5px; font-weight: 600; padding: 3px 9px; border-radius: 20px; display: inline-block; }
 .sec-badge--green { background: #dcfce7; color: #15803d; }

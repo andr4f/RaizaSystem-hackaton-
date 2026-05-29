@@ -41,10 +41,10 @@ VALUES (1, 'Juan Pérez', 'CC', '123456789', 'INDIVIDUAL',
         '3001234567', 'productor@raiza.co', 'Santa Marta', 'Magdalena', 'Vereda El Mirador',
         'cafe', 'HAS');
 
--- ── Usuario de login (bcrypt de "password") ─────────────────────────
+-- ── Usuario de login (bcrypt real de "password", generado por el encoder de la app) ──
 INSERT INTO app_user (id, name, email, password, role, active, onboarding_completed, profile_id, profile_type)
 VALUES (1, 'Juan Pérez', 'productor@raiza.co',
-        '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy',
+        '$2a$10$FZJN2GPrrI.BD01MrDHy/uLe.4la4O/stY720d93.W4wenM76nsqe',
         'PRODUCER', true, true, 1, 'PRODUCER');
 
 -- ── Finca ───────────────────────────────────────────────────────────

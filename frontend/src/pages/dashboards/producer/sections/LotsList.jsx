@@ -1,6 +1,8 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Package, Plus } from 'lucide-react'
 import { useProducerData } from '../useProducerData'
+import CreateLotModal from '../components/CreateLotModal'
 import './sections.css'
 
 const STATUS = {
@@ -20,6 +22,7 @@ function fmt(iso) {
 const LotsList = () => {
   const navigate = useNavigate()
   const { lots, loading, error } = useProducerData()
+  const [showCreate, setShowCreate] = useState(false)
 
   return (
     <div className="sec">
@@ -28,8 +31,10 @@ const LotsList = () => {
           <h1>Mis lotes</h1>
           <p>Gestiona tus lotes de producción y su trazabilidad.</p>
         </div>
-        <button className="sec-btn"><Plus size={16} /> Registrar lote</button>
+        <button className="sec-btn" onClick={() => setShowCreate(true)}><Plus size={16} /> Registrar lote</button>
       </div>
+
+      {showCreate && <CreateLotModal onClose={() => setShowCreate(false)} />}
 
       {loading && <div className="sec-loading">Cargando lotes…</div>}
       {error && !loading && <div className="sec-error">{error}</div>}

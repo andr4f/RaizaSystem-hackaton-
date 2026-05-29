@@ -1,0 +1,103 @@
+.rz-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 20, 10, 0.45);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 48px 20px;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.rz-modal {
+  background: #fff;
+  border-radius: 18px;
+  width: 100%;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.25);
+  animation: rz-modal-in 0.16s ease-out;
+}
+@keyframes rz-modal-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.rz-modal-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 24px 16px;
+  border-bottom: 1px solid #f3f4f6;
+}
+.rz-modal-title { font-size: 17px; font-weight: 700; color: #111827; }
+.rz-modal-sub { font-size: 13px; color: #6b7280; margin-top: 3px; }
+.rz-modal-close {
+  border: none; background: transparent; cursor: pointer;
+  color: #9ca3af; padding: 4px; border-radius: 8px;
+  display: flex; align-items: center; flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+}
+.rz-modal-close:hover { background: #f3f4f6; color: #111827; }
+
+.rz-modal-body { padding: 20px 24px 24px; }
+
+/* ── Formularios (compartido por los modales) ── */
+.rz-form { display: flex; flex-direction: column; gap: 16px; }
+.rz-field { display: flex; flex-direction: column; gap: 6px; }
+.rz-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.rz-label { font-size: 12.5px; font-weight: 600; color: #374151; }
+.rz-label .req { color: #dc2626; }
+
+.rz-input, .rz-select, .rz-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-family: inherit;
+  color: #111827;
+  background: #fff;
+  transition: border-color 0.15s;
+}
+.rz-input:focus, .rz-select:focus, .rz-textarea:focus {
+  outline: none;
+  border-color: #16a34a;
+}
+.rz-textarea { resize: vertical; min-height: 70px; }
+.rz-hint { font-size: 11.5px; color: #9ca3af; }
+
+.rz-error {
+  background: #fee2e2;
+  color: #b91c1c;
+  font-size: 12.5px;
+  padding: 9px 12px;
+  border-radius: 9px;
+}
+
+.rz-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 4px;
+}
+.rz-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s, opacity 0.15s;
+}
+.rz-btn--primary { background: #0d1f0f; color: #fff; }
+.rz-btn--primary:hover:not(:disabled) { background: #1b3a1f; }
+.rz-btn--primary:disabled { opacity: 0.5; cursor: not-allowed; }
+.rz-btn--ghost { background: #fff; border: 1.5px solid #e5e7eb; color: #374151; }
+.rz-btn--ghost:hover { background: #f3f4f6; }
+
+@media (max-width: 560px) {
+  .rz-field-row { grid-template-columns: 1fr; }
+}

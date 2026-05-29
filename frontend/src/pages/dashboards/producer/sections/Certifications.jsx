@@ -1,6 +1,8 @@
+import { useState } from 'react'
 import { BadgeCheck, Download, Sparkles } from 'lucide-react'
 import { useProducerData } from '../useProducerData'
 import { certificationApi } from '../../../../shared/api/certificationApi'
+import CertificationApplicationModal from '../components/CertificationApplicationModal'
 import './sections.css'
 
 const STATUS = {
@@ -17,6 +19,7 @@ function fmt(iso) {
 
 const Certifications = () => {
   const { applications, loading, error } = useProducerData()
+  const [showCreate, setShowCreate] = useState(false)
 
   return (
     <div className="sec">
@@ -25,8 +28,10 @@ const Certifications = () => {
           <h1>Certificaciones</h1>
           <p>Solicitudes de certificación de tus lotes y su estado.</p>
         </div>
-        <button className="sec-btn"><BadgeCheck size={16} /> Nueva solicitud</button>
+        <button className="sec-btn" onClick={() => setShowCreate(true)}><BadgeCheck size={16} /> Nueva solicitud</button>
       </div>
+
+      {showCreate && <CertificationApplicationModal onClose={() => setShowCreate(false)} />}
 
       {loading && <div className="sec-loading">Cargando certificaciones…</div>}
       {error && !loading && <div className="sec-error">{error}</div>}

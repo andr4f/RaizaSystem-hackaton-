@@ -1,5 +1,7 @@
+import { useState } from 'react'
 import { Users } from 'lucide-react'
 import { useProducerData } from '../useProducerData'
+import { leadApi } from '../../../../shared/api/leadApi'
 import './sections.css'
 
 const STATUS = {
@@ -7,6 +9,7 @@ const STATUS = {
   QUALIFIED: ['Calificado', 'amber'], IN_EXPORT_REVIEW: ['En revisión export.', 'amber'],
   CLOSED_WON: ['Cerrado (ganado)', 'green'], CLOSED_LOST: ['Cerrado (perdido)', 'gray'],
 }
+const STATUS_OPTIONS = Object.keys(STATUS)
 
 function fmt(iso) {
   if (!iso) return '—'
@@ -15,7 +18,21 @@ function fmt(iso) {
 }
 
 const LeadsInbox = () => {
-  const { leads, loading, error } = useProducerData()
+  const { leads, loading, error, refresh } = useProducerData()
+  const [updatingId, setUpdatingId] = useState(null)
+
+  const changeStatus = async (lead, newStatus) => {
+    if (newStatus === lead.leadStatus) return
+    setUpdatingId(lead.id)
+    try {
+      await leadApi.updateStatus(lead.id, newStatus)
+      await refresh()
+    } catch {
+      // el refresh revertirá visualmente si falló
+    } finally {
+      setUpdatingId(null)
+    }
+  }
 
   return (
     <div className="sec">
@@ -46,19 +63,27 @@ const LeadsInbox = () => {
               </tr>
             </thead>
             <tbody>
-              {leads.map(lead => {
-                const [label, color] = STATUS[lead.leadStatus] || [lead.leadStatus, 'gray']
-                return (
-                  <tr key={lead.id}>
-                    <td>{lead.buyerName || 'Anónimo'}</td>
-                    <td className="sec-mono">{lead.lotCode}</td>
-                    <td>{lead.requestedQuantity ? `${lead.requestedQuantity} ${lead.unitOfMeasure || ''}` : '—'}</td>
-                    <td>{lead.destinationCountry || '—'}</td>
-                    <td>{fmt(lead.createdAt)}</td>
-                    <td><span className={`sec-badge sec-badge--${color}`}>{label}</span></td>
-                  </tr>
-                )
-              })}
+              {leads.map(lead => (
+                <tr key={lead.id}>
+                  <td>{lead.buyerName || 'Anónimo'}</td>
+                  <td className="sec-mono">{lead.lotCode}</td>
+                  <td>{lead.requestedQuantity ? `${lead.requestedQuantity} ${lead.unitOfMeasure || ''}` : '—'}</td>
+                  <td>{lead.destinationCountry || '—'}</td>
+                  <td>{fmt(lead.createdAt)}</td>
+                  <td>
+                    <select
+                      className="sec-status-select"
+                      value={lead.leadStatus}
+                      disabled={updatingId === lead.id}
+                      onChange={(e) => changeStatus(lead, e.target.value)}
+                    >
+                      {STATUS_OPTIONS.map(s => (
+                        <option key={s} value={s}>{STATUS[s][0]}</option>
+                      ))}
+                    </select>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>

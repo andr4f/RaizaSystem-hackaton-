@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react'
-import { Route, MapPin } from 'lucide-react'
+import { useState, useEffect, useCallback } from 'react'
+import { Route, MapPin, Plus } from 'lucide-react'
 import { useProducerData } from '../useProducerData'
 import { lotApi } from '../../../../shared/api/lotApi'
+import AddTraceEventModal from '../components/AddTraceEventModal'
 import './sections.css'
 import './Traceability.css'
 
@@ -23,12 +24,15 @@ const TraceabilityEvents = () => {
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [showAdd, setShowAdd] = useState(false)
+
+  const lotObj = lots.find(l => String(l.id) === String(selectedLot))
 
   useEffect(() => {
     if (!selectedLot && lots.length > 0) setSelectedLot(String(lots[0].id))
   }, [lots, selectedLot])
 
-  useEffect(() => {
+  const loadEvents = useCallback(() => {
     if (!selectedLot) return
     setLoading(true); setError(null)
     lotApi.getEvents(selectedLot)
@@ -36,6 +40,8 @@ const TraceabilityEvents = () => {
       .catch(err => setError(err.message))
       .finally(() => setLoading(false))
   }, [selectedLot])
+
+  useEffect(() => { loadEvents() }, [loadEvents])
 
   return (
     <div className="sec">
@@ -45,11 +51,24 @@ const TraceabilityEvents = () => {
           <p>Sigue el recorrido de cada lote desde la cosecha hasta el comprador.</p>
         </div>
         {lots.length > 0 && (
-          <select className="trz-select" value={selectedLot} onChange={e => setSelectedLot(e.target.value)}>
-            {lots.map(l => <option key={l.id} value={l.id}>{l.lotCode} — {l.productName}</option>)}
-          </select>
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+            <select className="trz-select" value={selectedLot} onChange={e => setSelectedLot(e.target.value)}>
+              {lots.map(l => <option key={l.id} value={l.id}>{l.lotCode} — {l.productName}</option>)}
+            </select>
+            <button className="sec-btn" onClick={() => setShowAdd(true)} disabled={!selectedLot}>
+              <Plus size={16} /> Agregar evento
+            </button>
+          </div>
         )}
       </div>
+
+      {showAdd && lotObj && (
+        <AddTraceEventModal
+          lot={lotObj}
+          onClose={() => setShowAdd(false)}
+          onCreated={loadEvents}
+        />
+      )}
 
       {lots.length === 0 && (
         <div className="sec-empty"><Route size={32} className="sec-empty-icon" /><p>Registra un lote para ver su trazabilidad.</p></div>
