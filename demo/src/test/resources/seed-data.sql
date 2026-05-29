@@ -1,18 +1,11 @@
 -- Seed data for repository integration tests
-
--- Seed data for repository integration tests
 -- Use explicit IDs so that FK references remain valid even after transaction rollbacks (sequences don't roll back).
 
--- Products
-INSERT INTO product (id, name, category, unit_of_measure, description, created_at, updated_at)
-VALUES (1, 'Café Pergamino Seco', 'Café', 'kg', 'Café pergamino seco de altura', NOW(), NOW()),
-       (2, 'Banano de Exportación', 'Banano', 'cajas', 'Banano tipo exportación', NOW(), NOW()),
-       (3, 'Cacao Seco', 'Cacao', 'kg', 'Cacao seco fermentado', NOW(), NOW());
-
--- Certifications
-INSERT INTO certification (id, name, issuer, description, created_at, updated_at)
-VALUES (1, 'Fairtrade', 'Fairtrade International', 'Certificación de comercio justo', NOW(), NOW()),
-       (2, 'Rainforest Alliance', 'Rainforest Alliance', 'Certificación de agricultura sostenible', NOW(), NOW());
+-- Products  (featured: café/banano/cacao destacados)
+INSERT INTO product (id, name, category, unit_of_measure, description, featured, created_at, updated_at)
+VALUES (1, 'Café Pergamino Seco', 'Café', 'kg', 'Café pergamino seco de altura', true, NOW(), NOW()),
+       (2, 'Banano de Exportación', 'Banano', 'cajas', 'Banano tipo exportación', true, NOW(), NOW()),
+       (3, 'Cacao Seco', 'Cacao', 'kg', 'Cacao seco fermentado', true, NOW(), NOW());
 
 -- Producer
 INSERT INTO producer (id, name, document_type, document_number, producer_type, phone, email, municipality, department, community_name, created_at, updated_at)
@@ -22,14 +15,19 @@ VALUES (1, 'Asociación de Caficultores de Minca', 'NIT', '900123456-7', 'ASOCIA
 INSERT INTO farm (id, producer_id, name, municipality, corregimiento, latitude, longitude, altitude_meters, area_hectares, connectivity_level, notes, created_at, updated_at)
 VALUES (1, 1, 'Finca El Mirador', 'Minca', 'La Tagua', 11.1445, -74.1202, 1450, 5.50, 'media', 'Finca principal con cultivo de café bajo sombra', NOW(), NOW());
 
+-- Certifications  (modelo nuevo: certificación específica emitida a una finca)
+INSERT INTO certifications (id, farm_id, certifier, name, certificate_number, issued_at, expires_at, status, registered_at, registered_by, created_at, updated_at)
+VALUES (1, 1, 'FAIRTRADE', 'Fairtrade', 'FT-2026-001', '2026-01-01', '2027-01-01', 'ACTIVE', NOW(), 'system', NOW(), NOW()),
+       (2, 1, 'RAINFOREST_ALLIANCE', 'Rainforest Alliance', 'RA-2026-001', '2026-01-01', '2027-01-01', 'ACTIVE', NOW(), 'system', NOW(), NOW());
+
 -- Product Lot
 INSERT INTO product_lot (id, lot_code, producer_id, farm_id, product_id, harvest_date, available_quantity, unit_of_measure, process_type, cultivation_conditions, quality_grade, status, qr_code_value, created_at, updated_at)
 VALUES (1, 'CAF-MINCA-001', 1, 1, 1, '2026-05-15', 250.00, 'kg', 'lavado', 'Cultivo bajo sombra, secado solar, altura 1450 msnm', 'EXPORT', 'AVAILABLE', 'qr-caf-minca-001', NOW(), NOW());
 
--- Lot Certification
+-- Lot Certification  (status usa CertificationValidationStatus)
 INSERT INTO lot_certification (id, lot_id, certification_id, certificate_code, valid_from, valid_to, status, created_at, updated_at)
-VALUES (1, 1, 1, 'FT-2026-001', '2026-01-01', '2027-01-01', 'ACTIVE', NOW(), NOW()),
-       (2, 1, 2, 'RA-2026-001', '2026-01-01', '2027-01-01', 'ACTIVE', NOW(), NOW());
+VALUES (1, 1, 1, 'FT-2026-001', '2026-01-01', '2027-01-01', 'VALIDATED', NOW(), NOW()),
+       (2, 1, 2, 'RA-2026-001', '2026-01-01', '2027-01-01', 'VALIDATED', NOW(), NOW());
 
 -- Trace Events
 INSERT INTO trace_event (id, lot_id, event_type, event_timestamp, actor_type, actor_id, title, description, latitude, longitude, metric_name, metric_value, metric_unit, hash_value, previous_hash, created_at)
@@ -65,13 +63,13 @@ VALUES (1, 'Exportadores del Magdalena', 'ExportMagdalena SAS', 'EXP-001', 'Mar�
 INSERT INTO export_review (id, lead_id, exporter_id, review_status, notes, incoterm, created_at, updated_at)
 VALUES (1, 1, 1, 'PENDING_REVIEW', 'Revisar disponibilidad y documentación del lote', 'FOB', NOW(), NOW());
 
--- App User
-INSERT INTO app_user (id, name, email, password, role, active, created_at, updated_at)
-VALUES (1, 'Admin Magdalena', 'admin@magdalena.co', '$2a$10$dummy_hash_for_testing', 'ADMIN', true, NOW(), NOW());
+-- App User  (onboarding_completed es NOT NULL)
+INSERT INTO app_user (id, name, email, password, role, active, onboarding_completed, created_at, updated_at)
+VALUES (1, 'Admin Magdalena', 'admin@magdalena.co', '$2a$10$dummy_hash_for_testing', 'ADMIN', true, true, NOW(), NOW());
 
 -- Push sequences past explicit IDs so entity saves don't conflict
 ALTER SEQUENCE product_id_seq RESTART WITH 100;
-ALTER SEQUENCE certification_id_seq RESTART WITH 100;
+ALTER SEQUENCE certifications_id_seq RESTART WITH 100;
 ALTER SEQUENCE producer_id_seq RESTART WITH 100;
 ALTER SEQUENCE farm_id_seq RESTART WITH 100;
 ALTER SEQUENCE product_lot_id_seq RESTART WITH 100;
@@ -85,5 +83,3 @@ ALTER SEQUENCE purchase_lead_id_seq RESTART WITH 100;
 ALTER SEQUENCE exporter_id_seq RESTART WITH 100;
 ALTER SEQUENCE export_review_id_seq RESTART WITH 100;
 ALTER SEQUENCE app_user_id_seq RESTART WITH 100;
-
-
