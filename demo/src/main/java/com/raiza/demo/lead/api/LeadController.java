@@ -7,6 +7,7 @@ import com.raiza.demo.lead.dto.LeadResponse;
 import com.raiza.demo.lead.dto.UpdateLeadStatusRequest;
 import com.raiza.demo.lead.service.PurchaseLeadService;
 import com.raiza.demo.shared.enums.LeadStatus;
+import com.raiza.demo.shared.enums.UserRole;
 import com.raiza.demo.shared.response.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,14 +34,17 @@ public class LeadController {
     // ── Leads ─────────────────────────────────────────────────────────────
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'EXPORTER', 'PRODUCER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EXPORTER', 'PRODUCER', 'TOURISM_OPERATOR')")
     public ResponseEntity<ApiResponse<List<LeadResponse>>> findAll(
             @RequestParam(required = false) LeadStatus status,
             @RequestParam(required = false) Long lotId,
             @AuthenticationPrincipal UserPrincipal principal) {
         List<LeadResponse> result;
-        if (principal.getUser().getRole().name().equals("PRODUCER")) {
+        UserRole role = principal.getUser().getRole();
+        if (role == UserRole.PRODUCER) {
             result = leadService.findByProducer(principal.getUser().getProfileId());
+        } else if (role == UserRole.EXPORTER) {
+            result = leadService.findByExporter(principal.getUser().getProfileId());
         } else if (status != null) {
             result = leadService.findByStatus(status);
         } else if (lotId != null) {
@@ -52,13 +56,13 @@ public class LeadController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'EXPORTER', 'PRODUCER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EXPORTER', 'PRODUCER', 'TOURISM_OPERATOR')")
     public ResponseEntity<ApiResponse<LeadResponse>> findById(@PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.ok(leadService.findById(id)));
     }
 
     @PatchMapping("/{id}/status")
-    @PreAuthorize("hasAnyRole('ADMIN', 'EXPORTER', 'PRODUCER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EXPORTER', 'PRODUCER', 'TOURISM_OPERATOR')")
     public ResponseEntity<ApiResponse<LeadResponse>> updateStatus(
             @PathVariable Long id,
             @RequestBody @Valid UpdateLeadStatusRequest req) {

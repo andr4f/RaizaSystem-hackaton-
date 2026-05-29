@@ -16,4 +16,6 @@ public interface CertificationApplicationRepository extends JpaRepository<Certif
     Optional<CertificationApplication> findByApplicationCode(String applicationCode);
 
     boolean existsByLotIdAndCertificationId(Long lotId, Long certificationId);
+
+    long countByProducerIdAndStatus(Long producerId, CertificationApplicationStatus status);
 }

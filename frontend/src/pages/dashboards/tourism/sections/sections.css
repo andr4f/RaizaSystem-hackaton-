@@ -109,6 +109,21 @@
 }
 .tsec-notice svg { flex-shrink: 0; margin-top: 1px; color: var(--s-amber); }
 
+.tsec-subhead { font-size: 15px; font-weight: 700; color: var(--s-gray-900); margin-bottom: 10px; }
+.tsec-status-select {
+  padding: 6px 10px; border: 1.5px solid var(--s-gray-200); border-radius: 8px;
+  font-size: 12.5px; font-family: inherit; color: var(--s-gray-900); background: #fff; cursor: pointer;
+}
+.tsec-status-select:focus { outline: none; border-color: var(--s-green-500); }
+.tsec-status-select:disabled { opacity: 0.5; cursor: wait; }
+.tsec-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.tsec-kpi {
+  background: #fff; border: 1px solid var(--s-gray-200); border-radius: 14px; padding: 16px 18px;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.tsec-kpi strong { font-size: 26px; font-weight: 700; color: var(--s-gray-900); }
+.tsec-kpi span { font-size: 12px; color: var(--s-gray-500); }
+
 /* ── Formulario (Nueva experiencia) ── */
 .tsec-form {
   background: #fff; border: 1px solid var(--s-gray-200); border-radius: 16px;

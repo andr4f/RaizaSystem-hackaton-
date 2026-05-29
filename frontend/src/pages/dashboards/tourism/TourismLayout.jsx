@@ -22,7 +22,9 @@ const NAV = [
 const TourismLayout = () => {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
-  const { operator, experiences } = useTourismData()
+  const { operator, experiences, stats } = useTourismData()
+
+  const visits = stats?.visitsThisMonth ?? stats?.visits ?? 0
 
   const location = operator?.municipality
     ? `${operator.municipality}, Magdalena`
@@ -70,7 +72,7 @@ const TourismLayout = () => {
                 <span>Experiencias activas</span>
               </div>
               <div>
-                <strong>248</strong>
+                <strong>{visits}</strong>
                 <span>Visitas este mes</span>
               </div>
             </div>

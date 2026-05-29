@@ -1,29 +1,86 @@
-import { Wallet, Info } from 'lucide-react'
+import { Wallet } from 'lucide-react'
+import { useExporterData } from '../useExporterData'
 import './sections.css'
 
-// Placeholder: el back aún no expone endpoints financieros del exportador.
-const ExporterFinance = () => (
-  <div className="esec">
-    <div className="esec-head">
-      <div>
-        <h1>Finanzas</h1>
-        <p>Pagos, anticipos y estado financiero de tus operaciones de exportación.</p>
+function fmt(iso) {
+  if (!iso) return '—'
+  try {
+    return new Date(iso).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' })
+  } catch { return iso }
+}
+
+const ExporterFinance = () => {
+  const { finance, loading, error } = useExporterData()
+  const items = finance?.items ?? []
+
+  return (
+    <div className="esec">
+      <div className="esec-head">
+        <div>
+          <h1>Finanzas</h1>
+          <p>Volumen negociado y estado de tus operaciones de exportación.</p>
+        </div>
       </div>
-    </div>
 
-    <div className="esec-notice">
-      <Info size={16} />
-      <span>
-        El módulo financiero aún no tiene endpoints en el back
-        (<code>GET /exporters/finance</code>). Vista lista para conectarse cuando existan.
-      </span>
-    </div>
+      {loading && <div className="esec-loading">Cargando finanzas…</div>}
+      {error && !loading && <div className="esec-error">{error}</div>}
 
-    <div className="esec-empty">
-      <Wallet size={32} className="esec-empty-icon" />
-      <p>Aquí verás tus pagos, comisiones y balance de operaciones.</p>
+      {!loading && !error && (
+        <>
+          <div className="esec-kpis">
+            <div className="esec-kpi">
+              <strong>{finance?.negotiatedVolume ?? 0}</strong>
+              <span>Volumen negociado</span>
+            </div>
+            <div className="esec-kpi">
+              <strong>{finance?.activeDeals ?? 0}</strong>
+              <span>Órdenes activas</span>
+            </div>
+            <div className="esec-kpi">
+              <strong>{finance?.closedDeals ?? 0}</strong>
+              <span>Cerradas (ganadas)</span>
+            </div>
+            <div className="esec-kpi">
+              <strong>{finance?.pendingItems ?? 0}</strong>
+              <span>Leads nuevos</span>
+            </div>
+          </div>
+
+          {items.length === 0 ? (
+            <div className="esec-empty">
+              <Wallet size={32} className="esec-empty-icon" />
+              <p>Sin movimientos financieros registrados todavía.</p>
+            </div>
+          ) : (
+            <div className="esec-card">
+              <table className="esec-table">
+                <thead>
+                  <tr>
+                    <th>Comprador</th>
+                    <th>Detalle</th>
+                    <th>Volumen</th>
+                    <th>Estado</th>
+                    <th>Fecha</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {items.map((item, i) => (
+                    <tr key={`${item.label}-${i}`}>
+                      <td>{item.label}</td>
+                      <td>{item.detail}</td>
+                      <td>{item.volume}</td>
+                      <td><span className="esec-badge esec-badge--green">{item.status}</span></td>
+                      <td>{fmt(item.date)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </>
+      )}
     </div>
-  </div>
-)
+  )
+}
 
 export default ExporterFinance

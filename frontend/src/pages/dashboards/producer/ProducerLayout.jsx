@@ -22,9 +22,10 @@ const NAV = [
 const ProducerLayout = () => {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
-  const { lots, producer } = useProducerData()
+  const { lots, producer, stats } = useProducerData()
 
-  const activeLots = lots.filter(l => ['AVAILABLE', 'CERTIFICATION_PENDING', 'RESERVED'].includes(l.status)).length || lots.length
+  const activeLots = stats?.activeLots ?? lots.filter(l => ['AVAILABLE', 'CERTIFICATION_PENDING', 'RESERVED'].includes(l.status)).length
+  const qrScans = stats?.qrScansThisMonth ?? stats?.qrScans ?? 0
   const location = producer?.municipality
     ? `${producer.municipality}${producer.department ? ', ' + producer.department : ''}`
     : 'Sierra Nevada de Santa Marta'
@@ -67,7 +68,7 @@ const ProducerLayout = () => {
                 <span>Lotes activos</span>
               </div>
               <div>
-                <strong>248</strong>
+                <strong>{qrScans}</strong>
                 <span>Escaneos este mes</span>
               </div>
             </div>

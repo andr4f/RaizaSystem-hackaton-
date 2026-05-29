@@ -13,4 +13,6 @@ public interface LotCertificationRepository extends JpaRepository<LotCertificati
     boolean existsByLotIdAndCertificationId(Long lotId, Long certificationId);
 
     boolean existsByLotIdAndStatusIn(Long lotId, List<CertificationValidationStatus> statuses);
+
+    long countByLot_Producer_IdAndStatus(Long producerId, CertificationValidationStatus status);
 }

@@ -8,14 +8,8 @@ import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
 } from 'recharts'
 import { useProducerData } from '../useProducerData'
+import { formatTrendPct } from '../../../../shared/api/dashboardApi'
 import './ProducerHome.css'
-
-// La serie de escaneos QR aún no tiene endpoint agregado en el back.
-// Placeholder visual hasta que exista GET /producers/{id}/scan-activity.
-const SCAN_SERIES = [
-  { d: '1 May', v: 120 }, { d: '7 May', v: 180 }, { d: '13 May', v: 90 },
-  { d: '19 May', v: 210 }, { d: '25 May', v: 160 }, { d: '31 May', v: 248 },
-]
 
 const STATUS_LABEL = {
   AVAILABLE: 'Disponible', CERTIFICATION_PENDING: 'Cert. pendiente',
@@ -32,21 +26,22 @@ function fmtDate(iso) {
 
 const ProducerHome = () => {
   const navigate = useNavigate()
-  const { producer, lots, leads, applications, loading } = useProducerData()
+  const { producer, lots, leads, applications, stats: dashboardStats, loading } = useProducerData()
 
   const firstName = (producer?.name || 'Productor').split(' ')[0]
 
-  const stats = useMemo(() => {
-    const activeLots = lots.filter(l => ['AVAILABLE', 'CERTIFICATION_PENDING', 'RESERVED'].includes(l.status)).length
-    const validatedCerts = applications.filter(a => a.status === 'APPROVED' || a.status === 'VALIDATED').length
-    const openLeads = leads.filter(l => ['NEW', 'CONTACTED', 'QUALIFIED'].includes(l.leadStatus)).length
-    return {
-      activeLots: activeLots || lots.length,
-      qrScans: 248, // placeholder — sin endpoint agregado
-      certifications: validatedCerts || applications.length,
-      opportunities: openLeads || leads.length,
-    }
-  }, [lots, leads, applications])
+  const stats = useMemo(() => ({
+    activeLots: dashboardStats?.activeLots ?? 0,
+    qrScans: dashboardStats?.qrScansThisMonth ?? dashboardStats?.qrScans ?? 0,
+    certifications: dashboardStats?.certifications ?? 0,
+    opportunities: dashboardStats?.opportunities ?? 0,
+    qrTrend: formatTrendPct(dashboardStats?.qrScansTrendPct),
+  }), [dashboardStats])
+
+  const scanSeries = useMemo(
+    () => (dashboardStats?.series ?? []).map(p => ({ d: p.label, v: p.value })),
+    [dashboardStats],
+  )
 
   const recentLots = useMemo(
     () => [...lots].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3),
@@ -67,7 +62,7 @@ const ProducerHome = () => {
 
   const STAT_CARDS = [
     { key: 'activeLots',     label: 'Lotes activos',  value: stats.activeLots,     icon: Package,    foot: 'Ver mis lotes',       to: '/dashboard/producer/lotes' },
-    { key: 'qrScans',        label: 'Escaneos QR',    value: stats.qrScans,        icon: QrCode,     foot: 'Ver escaneos',        to: '/dashboard/producer/qr', up: '+18% vs. mes anterior' },
+    { key: 'qrScans',        label: 'Escaneos QR',    value: stats.qrScans,        icon: QrCode,     foot: 'Ver escaneos',        to: '/dashboard/producer/qr', up: stats.qrTrend },
     { key: 'certifications', label: 'Certificaciones',value: stats.certifications, icon: BadgeCheck, foot: 'Ver certificaciones', to: '/dashboard/producer/certificaciones' },
     { key: 'opportunities',  label: 'Oportunidades',  value: stats.opportunities,  icon: Users,      foot: 'Ver oportunidades',   to: '/dashboard/producer/leads' },
   ]
@@ -150,14 +145,19 @@ const ProducerHome = () => {
             <div className="ph-card-head">
               <div>
                 <h2>Actividad de escaneos</h2>
-                <span className="ph-chart-note">Datos de muestra · sin endpoint agregado aún</span>
               </div>
-              <span className="ph-chart-period">Este mes</span>
+              <span className="ph-chart-period">Últimos 6 meses</span>
             </div>
-            <div className="ph-chart-value">248 <span className="ph-chart-up">↑18%</span></div>
+            <div className="ph-chart-value">
+              {stats.qrScans}
+              {stats.qrTrend && <span className="ph-chart-up">↑{stats.qrTrend.replace(' vs. mes anterior', '')}</span>}
+            </div>
             <div className="ph-chart">
+              {scanSeries.length === 0 ? (
+                <p className="ph-empty">Sin escaneos registrados aún.</p>
+              ) : (
               <ResponsiveContainer width="100%" height={180}>
-                <AreaChart data={SCAN_SERIES} margin={{ top: 10, right: 8, left: -20, bottom: 0 }}>
+                <AreaChart data={scanSeries} margin={{ top: 10, right: 8, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="phScan" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor="#16a34a" stopOpacity={0.25} />
@@ -171,6 +171,7 @@ const ProducerHome = () => {
                   <Area type="monotone" dataKey="v" stroke="#16a34a" strokeWidth={2.5} fill="url(#phScan)" />
                 </AreaChart>
               </ResponsiveContainer>
+              )}
             </div>
           </section>
 

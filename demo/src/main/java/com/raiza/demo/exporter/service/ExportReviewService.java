@@ -1,7 +1,9 @@
 package com.raiza.demo.exporter.service;
 
+import com.raiza.demo.exporter.dto.ExporterOrderResponse;
 import com.raiza.demo.exporter.dto.ExporterReviewRequest;
 import com.raiza.demo.exporter.dto.ExporterReviewResponse;
+import com.raiza.demo.exporter.entity.ExportReview;
 import com.raiza.demo.exporter.entity.ExportReview;
 import com.raiza.demo.exporter.entity.Exporter;
 import com.raiza.demo.exporter.mapper.ExporterMapper;
@@ -42,6 +44,33 @@ public class ExportReviewService {
         return exportReviewRepository.findByExporterId(exporterId).stream()
                 .map(exporterMapper::toResponse)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ExporterOrderResponse> findOrdersByExporter(Long exporterId) {
+        return exportReviewRepository.findByExporterId(exporterId).stream()
+                .map(this::toOrderResponse)
+                .toList();
+    }
+
+    private ExporterOrderResponse toOrderResponse(ExportReview review) {
+        var lead = review.getLead();
+        var lot = lead.getLot();
+        String productName = lot.getProduct() != null ? lot.getProduct().getName() : null;
+        return new ExporterOrderResponse(
+                review.getId(),
+                lead.getId(),
+                lot.getLotCode(),
+                productName,
+                lead.getBuyer().getName(),
+                review.getReviewStatus(),
+                review.getIncoterm(),
+                review.getEstimatedDeliveryDate(),
+                lead.getRequestedQuantity(),
+                lead.getUnitOfMeasure(),
+                lead.getDestinationCountry(),
+                review.getCreatedAt(),
+                review.getNotes());
     }
 
     @Transactional

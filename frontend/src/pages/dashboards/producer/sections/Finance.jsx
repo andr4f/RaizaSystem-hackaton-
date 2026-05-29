@@ -1,28 +1,86 @@
-import { Wallet, Clock } from 'lucide-react'
+import { Wallet } from 'lucide-react'
+import { useProducerData } from '../useProducerData'
 import './sections.css'
 
-const Finance = () => (
-  <div className="sec">
-    <div className="sec-head">
-      <div>
-        <h1>Finanzas</h1>
-        <p>Ingresos, pagos y liquidaciones de tus ventas.</p>
-      </div>
-    </div>
+function fmt(iso) {
+  if (!iso) return '—'
+  try {
+    return new Date(iso).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' })
+  } catch { return iso }
+}
 
-    <div className="sec-empty" style={{ padding: '64px 24px' }}>
-      <Wallet size={36} className="sec-empty-icon" />
-      <h3 style={{ fontSize: 16, fontWeight: 700, color: '#111827', margin: '8px 0' }}>Próximamente</h3>
-      <p style={{ maxWidth: 420, margin: '0 auto' }}>
-        El módulo de finanzas aún no tiene endpoints en el backend (no existe un modelo de pagos
-        ni ingresos). Cuando se agregue <code>GET /producers/&#123;id&#125;/finance</code> esta sección
-        mostrará ingresos, pagos pendientes y liquidaciones.
-      </p>
-      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 12, fontSize: 12.5, color: '#d97706' }}>
-        <Clock size={14} /> Pendiente de backend
-      </span>
+const Finance = () => {
+  const { finance, loading, error } = useProducerData()
+  const items = finance?.items ?? []
+
+  return (
+    <div className="sec">
+      <div className="sec-head">
+        <div>
+          <h1>Finanzas</h1>
+          <p>Volumen negociado e intenciones de compra recibidas por tus lotes.</p>
+        </div>
+      </div>
+
+      {loading && <div className="sec-loading">Cargando finanzas…</div>}
+      {error && !loading && <div className="sec-error">{error}</div>}
+
+      {!loading && !error && (
+        <>
+          <div className="sec-kpis">
+            <div className="sec-kpi">
+              <strong>{finance?.negotiatedVolume ?? 0}</strong>
+              <span>Volumen solicitado</span>
+            </div>
+            <div className="sec-kpi">
+              <strong>{finance?.activeDeals ?? 0}</strong>
+              <span>Leads activos</span>
+            </div>
+            <div className="sec-kpi">
+              <strong>{finance?.closedDeals ?? 0}</strong>
+              <span>Cerrados (ganados)</span>
+            </div>
+            <div className="sec-kpi">
+              <strong>{finance?.pendingItems ?? 0}</strong>
+              <span>Nuevos sin contactar</span>
+            </div>
+          </div>
+
+          {items.length === 0 ? (
+            <div className="sec-empty" style={{ padding: '48px 24px' }}>
+              <Wallet size={32} className="sec-empty-icon" />
+              <p>Sin movimientos financieros registrados todavía.</p>
+            </div>
+          ) : (
+            <div className="sec-card">
+              <table className="sec-table">
+                <thead>
+                  <tr>
+                    <th>Comprador</th>
+                    <th>Lote</th>
+                    <th>Volumen</th>
+                    <th>Estado</th>
+                    <th>Fecha</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {items.map((item, i) => (
+                    <tr key={`${item.label}-${i}`}>
+                      <td>{item.label}</td>
+                      <td className="sec-mono">{item.detail}</td>
+                      <td>{item.volume}</td>
+                      <td><span className="sec-badge sec-badge--green">{item.status}</span></td>
+                      <td>{fmt(item.date)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </>
+      )}
     </div>
-  </div>
-)
+  )
+}
 
 export default Finance

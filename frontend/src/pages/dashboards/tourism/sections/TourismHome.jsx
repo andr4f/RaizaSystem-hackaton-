@@ -5,6 +5,7 @@ import {
   PlusCircle, QrCode, UserPlus,
 } from 'lucide-react'
 import { useTourismData } from '../useTourismData'
+import { formatTrendPct } from '../../../../shared/api/dashboardApi'
 import cafeImg from '../../../../assets/imagen-cafe-tabi.png'
 import cacaoImg from '../../../../assets/imagen-cacao-fino.jpg'
 import expImg from '../../../../assets/imagen-modulo-segundo-operadorTuristico.png'
@@ -20,17 +21,18 @@ export function experienceImage(title) {
 const TourismHome = () => {
   const navigate = useNavigate()
   const {
-    operator, experiences, alliedProducers, linkedLotCount, loading,
+    operator, experiences, alliedProducers, linkedLotCount, stats: dashboardStats, loading,
   } = useTourismData()
 
   const firstName = (operator?.contactName || 'Operador').split(' ')[0]
 
   const stats = useMemo(() => ({
-    experiences: experiences.length,
-    visits: 248,        // placeholder — sin endpoint de visitas/escaneos agregado
-    bookings: 36,       // placeholder — sin endpoint de reservas
-    allies: alliedProducers.length,
-  }), [experiences, alliedProducers])
+    experiences: dashboardStats?.experiences ?? experiences.length,
+    visits: dashboardStats?.visitsThisMonth ?? dashboardStats?.visits ?? 0,
+    bookings: dashboardStats?.bookings ?? 0,
+    allies: dashboardStats?.allies ?? alliedProducers.length,
+    visitsTrend: formatTrendPct(dashboardStats?.visitsTrendPct),
+  }), [dashboardStats, experiences, alliedProducers])
 
   // Perfil completo derivado de los campos del operador + actividad.
   const profile = useMemo(() => {
@@ -45,10 +47,10 @@ const TourismHome = () => {
   }, [operator, experiences, linkedLotCount])
 
   const STAT_CARDS = [
-    { key: 'experiences', label: 'Experiencias activas', value: stats.experiences, icon: Compass,       trend: '+20% vs. mes anterior', foot: 'Ver experiencias', to: '/dashboard/tourism/experiencias' },
-    { key: 'visits',      label: 'Visitas este mes',     value: stats.visits,      icon: MapPin,        trend: '+18% vs. mes anterior', foot: 'Ver visitas',      to: '/dashboard/tourism/reportes' },
-    { key: 'bookings',    label: 'Reservas confirmadas', value: stats.bookings,    icon: CalendarCheck, trend: '+25% vs. mes anterior', foot: 'Ver reservas',     to: '/dashboard/tourism/reservas' },
-    { key: 'allies',      label: 'Productores aliados',  value: stats.allies,      icon: Users,         trend: '+12% vs. mes anterior', foot: 'Ver aliados',      to: '/dashboard/tourism/aliados' },
+    { key: 'experiences', label: 'Experiencias activas', value: stats.experiences, icon: Compass,       trend: null, foot: 'Ver experiencias', to: '/dashboard/tourism/experiencias' },
+    { key: 'visits',      label: 'Visitas este mes',     value: stats.visits,      icon: MapPin,        trend: stats.visitsTrend || '—', foot: 'Ver visitas',      to: '/dashboard/tourism/reportes' },
+    { key: 'bookings',    label: 'Reservas confirmadas', value: stats.bookings,    icon: CalendarCheck, trend: null, foot: 'Ver reservas',     to: '/dashboard/tourism/reservas' },
+    { key: 'allies',      label: 'Productores aliados',  value: stats.allies,      icon: Users,         trend: null, foot: 'Ver aliados',      to: '/dashboard/tourism/aliados' },
   ]
 
   const QUICK = [
@@ -78,7 +80,7 @@ const TourismHome = () => {
               <div className="th-stat-icon"><Icon size={16} strokeWidth={1.8} /></div>
             </div>
             <div className="th-stat-value">{loading ? '—' : value}</div>
-            <span className="th-stat-trend">{trend}</span>
+            <span className="th-stat-trend">{trend || ''}</span>
             <button className="th-stat-foot" onClick={() => navigate(to)}>
               {foot} <ArrowRight size={12} />
             </button>

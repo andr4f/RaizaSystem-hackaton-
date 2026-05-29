@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect, useCallback, useMemo } 
 import { useAuth } from '../../../app/providers/AuthContext'
 import { tourismApi } from '../../../shared/api/tourismApi'
 import { lotApi } from '../../../shared/api/lotApi'
+import { dashboardApi } from '../../../shared/api/dashboardApi'
 
 const TourismDataContext = createContext(null)
 
@@ -13,6 +14,11 @@ export function TourismDataProvider({ children }) {
   const [experiences, setExperiences] = useState([])
   const [lotsByExp, setLotsByExp]     = useState({}) // { [experienceId]: ExperienceLotResponse[] }
   const [lots, setLots]               = useState([]) // catálogo de lotes (para vincular / aliados)
+  const [stats, setStats]             = useState(null)
+  const [leads, setLeads]             = useState([])
+  const [visits, setVisits]           = useState([])
+  const [bookings, setBookings]       = useState([])
+  const [finance, setFinance]         = useState(null)
   const [loading, setLoading]         = useState(true)
   const [error, setError]             = useState(null)
 
@@ -24,8 +30,13 @@ export function TourismDataProvider({ children }) {
         tourismApi.getOperators(),
         operatorId ? tourismApi.getOperatorExperiences(operatorId) : Promise.resolve({ data: [] }),
         lotApi.getAll(),
+        dashboardApi.getStats(),
+        operatorId ? tourismApi.getOperatorLeads(operatorId) : Promise.resolve({ data: [] }),
+        operatorId ? tourismApi.getOperatorVisits(operatorId) : Promise.resolve({ data: [] }),
+        operatorId ? tourismApi.getOperatorBookings(operatorId) : Promise.resolve({ data: [] }),
+        operatorId ? tourismApi.getOperatorFinance(operatorId) : Promise.resolve({ data: null }),
       ])
-      const [opRes, exRes, lotRes] = results
+      const [opRes, exRes, lotRes, sRes, ldRes, viRes, bkRes, fnRes] = results
 
       if (opRes.status === 'fulfilled') {
         const all = opRes.value.data ?? []
@@ -46,6 +57,12 @@ export function TourismDataProvider({ children }) {
         map[e.id] = r.status === 'fulfilled' ? (r.value.data ?? []) : []
       })
       setLotsByExp(map)
+
+      if (sRes.status === 'fulfilled') setStats(sRes.value.data ?? null)
+      if (ldRes.status === 'fulfilled') setLeads(ldRes.value.data ?? [])
+      if (viRes.status === 'fulfilled') setVisits(viRes.value.data ?? [])
+      if (bkRes.status === 'fulfilled') setBookings(bkRes.value.data ?? [])
+      if (fnRes.status === 'fulfilled') setFinance(fnRes.value.data ?? null)
 
       const firstError = results.find(r => r.status === 'rejected')
       if (firstError) setError(firstError.reason?.message ?? 'Error cargando datos')
@@ -103,7 +120,8 @@ export function TourismDataProvider({ children }) {
   const value = {
     user, operatorId, operator,
     experiences, lotsByExp, lots, lotsById,
-    alliedProducers, linkedLotCount,
+    alliedProducers, linkedLotCount, stats,
+    leads, visits, bookings, finance,
     loading, error, refresh: load,
   }
 

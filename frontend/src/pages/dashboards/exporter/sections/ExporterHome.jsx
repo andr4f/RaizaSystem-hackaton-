@@ -16,12 +16,10 @@ const LEAD_STATUS = {
   QUALIFIED: ['Propuesta', 'green'], IN_EXPORT_REVIEW: ['En revisión', 'amber'],
   CLOSED_WON: ['Cerrado', 'green'], CLOSED_LOST: ['Perdido', 'gray'],
 }
-const ACTIVE_LEADS = ['NEW', 'CONTACTED', 'QUALIFIED', 'IN_EXPORT_REVIEW']
 const REVIEW_LABEL = {
   PENDING_REVIEW: 'Pendiente de revisión', UNDER_REVIEW: 'En revisión',
   APPROVED: 'Aprobada', REJECTED: 'Rechazada',
 }
-const ACTIVE_REVIEWS = ['PENDING_REVIEW', 'UNDER_REVIEW']
 
 function lotImage(productName) {
   const p = (productName || '').toLowerCase()
@@ -39,24 +37,22 @@ function fmtWhen(iso) {
 
 const ExporterHome = () => {
   const navigate = useNavigate()
-  const { user, exporter, reviews, verifiedLots, leads, lotsById, loading } = useExporterData()
+  const { user, exporter, reviews, verifiedLots, leads, lotsById, stats: dashboardStats, loading } = useExporterData()
 
   const firstName = (exporter?.contactName || user?.name || 'Exportador').split(' ')[0]
 
-  const stats = useMemo(() => {
-    const openOpps = leads.filter(l => ACTIVE_LEADS.includes(l.leadStatus)).length
-    const activeReviews = reviews.filter(r => ACTIVE_REVIEWS.includes(r.reviewStatus)).length
-    const volume = leads.reduce((s, l) => s + (Number(l.requestedQuantity) || 0), 0)
-    return {
-      verified: verifiedLots.length,
-      opportunities: openOpps,
-      orders: activeReviews,
-      volume,
-    }
-  }, [leads, reviews, verifiedLots])
+  const myLeadIds = useMemo(() => new Set(reviews.map(r => r.leadId)), [reviews])
+  const myLeads = useMemo(() => leads.filter(l => myLeadIds.has(l.id)), [leads, myLeadIds])
+
+  const stats = useMemo(() => ({
+    verified: dashboardStats?.verifiedLots ?? 0,
+    opportunities: dashboardStats?.opportunities ?? 0,
+    orders: dashboardStats?.orders ?? 0,
+    volume: dashboardStats?.volume ?? 0,
+  }), [dashboardStats])
 
   const opps = useMemo(
-    () => leads.slice(0, 5).map(l => {
+    () => myLeads.slice(0, 5).map(l => {
       const lot = lotsById.get(l.lotId)
       return {
         id: l.id,
@@ -69,7 +65,7 @@ const ExporterHome = () => {
         when: fmtWhen(l.createdAt),
       }
     }),
-    [leads, lotsById],
+    [myLeads, lotsById],
   )
 
   const activity = useMemo(() => {
@@ -80,7 +76,7 @@ const ExporterHome = () => {
       text: `${REVIEW_LABEL[r.reviewStatus] || r.reviewStatus}${r.incoterm ? ' · ' + r.incoterm : ''}`,
       ts: r.createdAt,
     }))
-    leads.forEach(l => {
+    myLeads.forEach(l => {
       const lot = lotsById.get(l.lotId)
       items.push({
         dot: 'green',
@@ -89,7 +85,8 @@ const ExporterHome = () => {
         ts: l.createdAt,
       })
     })
-    verifiedLots.forEach(l => items.push({
+    const myLotIds = new Set(myLeads.map(l => l.lotId))
+    verifiedLots.filter(l => myLotIds.has(l.id)).forEach(l => items.push({
       dot: 'blue',
       title: `Lote ${l.lotCode} verificado`,
       text: `${l.productName} · ${l.availableQuantity} ${l.unitOfMeasure}`,
@@ -98,7 +95,7 @@ const ExporterHome = () => {
     return items
       .sort((a, b) => new Date(b.ts) - new Date(a.ts))
       .slice(0, 4)
-  }, [reviews, leads, verifiedLots, lotsById])
+  }, [reviews, myLeads, verifiedLots, lotsById])
 
   const featured = useMemo(
     () => [...verifiedLots]

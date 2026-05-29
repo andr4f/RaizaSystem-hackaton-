@@ -68,6 +68,32 @@ public class PurchaseLeadService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<LeadResponse> findByExporter(Long exporterId) {
+        return purchaseLeadRepository.findByExporterId(exporterId).stream()
+                .map(leadMapper::toResponse)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<LeadResponse> findByLotIds(List<Long> lotIds) {
+        if (lotIds == null || lotIds.isEmpty()) {
+            return List.of();
+        }
+        return purchaseLeadRepository.findByLotIdInOrderByCreatedAtDesc(lotIds).stream()
+                .map(leadMapper::toResponse)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public boolean isLeadOnLots(Long leadId, List<Long> lotIds) {
+        if (lotIds == null || lotIds.isEmpty()) {
+            return false;
+        }
+        PurchaseLead lead = getLeadOrThrow(leadId);
+        return lead.getLot() != null && lotIds.contains(lead.getLot().getId());
+    }
+
     @Transactional
     public LeadResponse createPublicLead(CreatePublicLeadRequest request) {
         ProductLot lot = productLotService.getLotOrThrow(request.lotId());

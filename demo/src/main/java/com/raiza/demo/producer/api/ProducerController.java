@@ -3,14 +3,20 @@ package com.raiza.demo.producer.api;
 import com.raiza.demo.farm.dto.CreateFarmRequest;
 import com.raiza.demo.farm.dto.FarmResponse;
 import com.raiza.demo.farm.service.FarmService;
+import com.raiza.demo.finance.service.FinanceService;
 import com.raiza.demo.producer.dto.CreateProducerRequest;
 import com.raiza.demo.producer.dto.ProducerResponse;
 import com.raiza.demo.producer.service.ProducerService;
+import com.raiza.demo.security.model.UserPrincipal;
+import com.raiza.demo.shared.dto.FinanceSummaryResponse;
+import com.raiza.demo.shared.enums.UserRole;
+import com.raiza.demo.shared.exception.ForbiddenException;
 import com.raiza.demo.shared.response.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -26,6 +32,7 @@ public class ProducerController {
 
     private final ProducerService producerService;
     private final FarmService farmService;
+    private final FinanceService financeService;
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'PRODUCER')")
@@ -64,5 +71,17 @@ public class ProducerController {
         FarmResponse created = farmService.create(req);
         URI location = uriBuilder.path("/api/v1/farms/{farmId}").buildAndExpand(created.id()).toUri();
         return ResponseEntity.created(location).body(ApiResponse.created(created));
+    }
+
+    @GetMapping("/{id}/finance")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PRODUCER')")
+    public ResponseEntity<ApiResponse<FinanceSummaryResponse>> findFinance(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserPrincipal principal) {
+        if (principal.getUser().getRole() == UserRole.PRODUCER
+                && !id.equals(principal.getUser().getProfileId())) {
+            throw new ForbiddenException("Access denied for this producer");
+        }
+        return ResponseEntity.ok(ApiResponse.ok(financeService.forProducer(id)));
     }
 }

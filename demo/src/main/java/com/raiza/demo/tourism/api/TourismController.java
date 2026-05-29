@@ -1,7 +1,11 @@
 package com.raiza.demo.tourism.api;
 
+import com.raiza.demo.lead.dto.UpdateLeadStatusRequest;
+import com.raiza.demo.security.model.UserPrincipal;
+import com.raiza.demo.shared.dto.FinanceSummaryResponse;
 import com.raiza.demo.shared.dto.ReferenceItem;
 import com.raiza.demo.shared.enums.ExperienceType;
+import com.raiza.demo.shared.enums.UserRole;
 import com.raiza.demo.shared.response.ApiResponse;
 import com.raiza.demo.tourism.dto.*;
 import com.raiza.demo.tourism.service.TourismService;
@@ -9,6 +13,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -98,5 +103,59 @@ public class TourismController {
         URI location = uriBuilder.path("/api/v1/tourism/experiences/{id}/lots")
                 .buildAndExpand(experienceId).toUri();
         return ResponseEntity.created(location).body(ApiResponse.created(created));
+    }
+
+    // ── Leads, visitas, reservas y finanzas del operador ─────────────────
+
+    @GetMapping("/operators/{id}/leads")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TOURISM_OPERATOR')")
+    public ResponseEntity<ApiResponse<List<TourismLeadResponse>>> findLeads(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserPrincipal principal) {
+        assertOperatorAccess(id, principal);
+        return ResponseEntity.ok(ApiResponse.ok(tourismService.findLeadsByOperator(id)));
+    }
+
+    @GetMapping("/operators/{id}/visits")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TOURISM_OPERATOR')")
+    public ResponseEntity<ApiResponse<List<TourismVisitResponse>>> findVisits(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserPrincipal principal) {
+        assertOperatorAccess(id, principal);
+        return ResponseEntity.ok(ApiResponse.ok(tourismService.findVisitsByOperator(id)));
+    }
+
+    @GetMapping("/operators/{id}/bookings")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TOURISM_OPERATOR')")
+    public ResponseEntity<ApiResponse<List<TourismBookingResponse>>> findBookings(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserPrincipal principal) {
+        assertOperatorAccess(id, principal);
+        return ResponseEntity.ok(ApiResponse.ok(tourismService.findBookingsByOperator(id)));
+    }
+
+    @GetMapping("/operators/{id}/finance")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TOURISM_OPERATOR')")
+    public ResponseEntity<ApiResponse<FinanceSummaryResponse>> findFinance(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserPrincipal principal) {
+        assertOperatorAccess(id, principal);
+        return ResponseEntity.ok(ApiResponse.ok(tourismService.findFinanceByOperator(id)));
+    }
+
+    @PatchMapping("/operators/{operatorId}/leads/{leadId}/status")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TOURISM_OPERATOR')")
+    public ResponseEntity<ApiResponse<TourismLeadResponse>> updateLeadStatus(
+            @PathVariable Long operatorId,
+            @PathVariable Long leadId,
+            @RequestBody @Valid UpdateLeadStatusRequest req,
+            @AuthenticationPrincipal UserPrincipal principal) {
+        assertOperatorAccess(operatorId, principal);
+        return ResponseEntity.ok(ApiResponse.ok(tourismService.updateLeadStatus(operatorId, leadId, req)));
+    }
+
+    private void assertOperatorAccess(Long operatorId, UserPrincipal principal) {
+        boolean isAdmin = principal.getUser().getRole() == UserRole.ADMIN;
+        tourismService.assertOperatorAccess(operatorId, principal.getUser().getProfileId(), isAdmin);
     }
 }

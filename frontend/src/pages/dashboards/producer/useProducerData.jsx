@@ -4,6 +4,7 @@ import { producerApi } from '../../../shared/api/producerApi'
 import { lotApi } from '../../../shared/api/lotApi'
 import { leadApi } from '../../../shared/api/leadApi'
 import { certificationApi } from '../../../shared/api/certificationApi'
+import { dashboardApi } from '../../../shared/api/dashboardApi'
 
 const ProducerDataContext = createContext(null)
 
@@ -15,6 +16,8 @@ export function ProducerDataProvider({ children }) {
   const [lots, setLots]           = useState([])
   const [leads, setLeads]         = useState([])
   const [applications, setApps]   = useState([])
+  const [stats, setStats]         = useState(null)
+  const [finance, setFinance]     = useState(null)
   const [loading, setLoading]     = useState(true)
   const [error, setError]         = useState(null)
 
@@ -28,12 +31,16 @@ export function ProducerDataProvider({ children }) {
         lotApi.getByProducer(producerId),
         leadApi.getAll(),
         certificationApi.getApplications(producerId),
+        dashboardApi.getStats(),
+        producerApi.getFinance(producerId),
       ])
-      const [pRes, lRes, leRes, cRes] = results
+      const [pRes, lRes, leRes, cRes, sRes, fRes] = results
       if (pRes.status === 'fulfilled')  setProducer(pRes.value.data)
       if (lRes.status === 'fulfilled')  setLots(lRes.value.data ?? [])
       if (leRes.status === 'fulfilled') setLeads(leRes.value.data ?? [])
       if (cRes.status === 'fulfilled')  setApps(cRes.value.data ?? [])
+      if (sRes.status === 'fulfilled')  setStats(sRes.value.data ?? null)
+      if (fRes.status === 'fulfilled')  setFinance(fRes.value.data ?? null)
       const firstError = results.find(r => r.status === 'rejected')
       if (firstError) setError(firstError.reason?.message ?? 'Error cargando datos')
     } catch (err) {
@@ -46,7 +53,7 @@ export function ProducerDataProvider({ children }) {
   useEffect(() => { load() }, [load])
 
   const value = {
-    producerId, producer, lots, leads, applications,
+    producerId, producer, lots, leads, applications, stats, finance,
     loading, error, refresh: load,
   }
 
