@@ -7,6 +7,7 @@ public record CreateProductRequest(
         @NotBlank @Size(max = 100) String name,
         @NotBlank @Size(max = 50) String category,
         @NotBlank @Size(max = 20) String unitOfMeasure,
-        String description
+        String description,
+        boolean featured
 ) {
 }

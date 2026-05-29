@@ -10,6 +10,10 @@ public record CreateExporterRequest(
         @Size(max = 120) String contactName,
         @Size(max = 30) String phone,
         @Size(max = 120) String email,
-        @Size(max = 80) String municipality
+        @Size(max = 80) String municipality,
+        // Respuestas del onboarding
+        @Size(max = 255) String markets,
+        @Size(max = 255) String handledProducts,
+        @Size(max = 40) String monthlyVolumeRange
 ) {
 }

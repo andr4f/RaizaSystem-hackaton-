@@ -13,4 +13,6 @@ public interface PurchaseLeadRepository extends JpaRepository<PurchaseLead, Long
     List<PurchaseLead> findByLotId(Long lotId);
 
     List<PurchaseLead> findAllByOrderByCreatedAtDesc();
+
+    List<PurchaseLead> findByLot_Producer_IdOrderByCreatedAtDesc(Long producerId);
 }

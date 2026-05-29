@@ -53,16 +53,25 @@ CREATE TABLE product (
 );
 
 -- ---------------------------------------------------------------------
--- certification (catalog)
+-- certifications (-> farm). Certificación específica emitida a una finca.
 -- ---------------------------------------------------------------------
-CREATE TABLE certification (
-    id          BIGSERIAL PRIMARY KEY,
-    name        VARCHAR(100) NOT NULL,
-    issuer      VARCHAR(120),
-    description TEXT,
-    created_at  TIMESTAMP    NOT NULL DEFAULT now(),
-    updated_at  TIMESTAMP
+CREATE TABLE certifications (
+    id                 BIGSERIAL PRIMARY KEY,
+    farm_id            BIGINT       NOT NULL REFERENCES farm (id),
+    certifier          VARCHAR(50)  NOT NULL,
+    name               VARCHAR(150) NOT NULL,
+    certificate_number VARCHAR(100) NOT NULL,
+    issued_at          DATE         NOT NULL,
+    expires_at         DATE,
+    verification_url   VARCHAR(500),
+    document_path      VARCHAR(500),
+    status             VARCHAR(20)  NOT NULL,
+    registered_at      TIMESTAMP    NOT NULL,
+    registered_by      VARCHAR(255) NOT NULL,
+    created_at         TIMESTAMP    NOT NULL DEFAULT now(),
+    updated_at         TIMESTAMP
 );
+CREATE INDEX idx_certifications_farm_id ON certifications (farm_id);
 
 -- ---------------------------------------------------------------------
 -- buyer
@@ -165,7 +174,7 @@ CREATE INDEX idx_product_lot_qr_code_value ON product_lot (qr_code_value);
 CREATE TABLE lot_certification (
     id               BIGSERIAL PRIMARY KEY,
     lot_id           BIGINT NOT NULL REFERENCES product_lot (id),
-    certification_id BIGINT NOT NULL REFERENCES certification (id),
+    certification_id BIGINT NOT NULL REFERENCES certifications (id),
     certificate_code VARCHAR(80),
     valid_from       DATE,
     valid_to         DATE,
@@ -281,7 +290,7 @@ CREATE TABLE certification_application (
     producer_id       BIGINT       NOT NULL REFERENCES producer (id),
     farm_id           BIGINT       NOT NULL REFERENCES farm (id),
     lot_id            BIGINT       NOT NULL REFERENCES product_lot (id),
-    certification_id  BIGINT       NOT NULL REFERENCES certification (id),
+    certification_id  BIGINT       NOT NULL REFERENCES certifications (id),
     status            VARCHAR(30)  NOT NULL DEFAULT 'DRAFT',
     payload_json      TEXT         NOT NULL,
     pdf_path          VARCHAR(255),

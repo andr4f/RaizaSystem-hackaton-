@@ -28,6 +28,19 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
+    public List<ProductResponse> find(Boolean featured, String category) {
+        List<Product> result;
+        if (Boolean.TRUE.equals(featured)) {
+            result = productRepository.findByFeaturedTrueOrderByNameAsc();
+        } else if (category != null && !category.isBlank()) {
+            result = productRepository.findByCategoryIgnoreCase(category);
+        } else {
+            result = productRepository.findAll();
+        }
+        return result.stream().map(productMapper::toResponse).toList();
+    }
+
+    @Transactional(readOnly = true)
     public ProductResponse findById(Long id) {
         return productMapper.toResponse(getProductOrThrow(id));
     }

@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -50,7 +51,15 @@ public class SecurityConfig {
                 // Rutas públicas — sin autenticación
                 .requestMatchers("/public/**").permitAll()
                 .requestMatchers("/api/v1/auth/**").permitAll()
+                .requestMatchers("/api/v1/chat/**").permitAll()
                 .requestMatchers("/actuator/health").permitAll()
+                // Catálogos de referencia del onboarding (solo lectura, pre-registro)
+                .requestMatchers(HttpMethod.GET,
+                        "/api/v1/municipalities/**",
+                        "/api/v1/markets/**",
+                        "/api/v1/tourism/experience-types",
+                        "/api/v1/products/**",
+                        "/api/v1/certifications/**").permitAll()
                 // Todo lo demás requiere JWT válido
                 .anyRequest().authenticated()
             )

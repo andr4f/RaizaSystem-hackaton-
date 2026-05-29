@@ -1,0 +1,339 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --es1-green-900: #0d1f0f;
+  --es1-green-800: #1b3a1f;
+  --es1-orange:    #d97706;
+  --es1-amber-100: #fef3c7;
+  --es1-amber-600: #d97706;
+  --es1-gray-100:  #f3f4f6;
+  --es1-gray-200:  #e5e7eb;
+  --es1-gray-400:  #9ca3af;
+  --es1-gray-500:  #6b7280;
+  --es1-gray-900:  #111827;
+  --es1-font-sans: 'Inter', -apple-system, system-ui, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+.es1-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  font-family: var(--es1-font-sans);
+}
+
+/* ── Navbar ── */
+.es1-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 40px;
+  border-bottom: 1px solid var(--es1-gray-100);
+}
+.es1-nav-logo { height: 28px; width: auto; display: block; }
+.es1-nav-actions { display: flex; align-items: center; gap: 16px; }
+.es1-nav-text { font-size: 13px; color: var(--es1-gray-500); }
+.es1-nav-btn {
+  padding: 8px 18px;
+  border: 1.5px solid var(--es1-gray-200);
+  border-radius: 8px;
+  background: #fff;
+  font-family: var(--es1-font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--es1-gray-900);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.es1-nav-btn:hover { background: var(--es1-gray-100); }
+
+/* ── Body ── */
+.es1-body {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  gap: 48px;
+  padding: 28px 40px 40px;
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.es1-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  min-width: 0;
+}
+
+/* ── Top bar: Volver + progress inline ── */
+.es1-top-bar {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.es1-back-top {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border: 1.5px solid var(--es1-gray-200);
+  border-radius: 8px;
+  background: #fff;
+  font-family: var(--es1-font-sans);
+  font-size: 13px;
+  color: var(--es1-gray-500);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.es1-back-top:hover { background: var(--es1-gray-100); }
+
+.es1-progress { display: flex; align-items: center; }
+
+.es1-progress-item { display: flex; align-items: center; }
+
+.es1-progress-line {
+  width: 32px;
+  height: 2px;
+  background: var(--es1-gray-200);
+}
+.es1-progress-line.done { background: var(--es1-gray-900); }
+
+.es1-progress-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--es1-gray-200);
+  background: #fff;
+  color: var(--es1-gray-400);
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.es1-progress-circle.active,
+.es1-progress-circle.done {
+  background: var(--es1-gray-900);
+  border-color: var(--es1-gray-900);
+  color: #fff;
+}
+
+/* ── Pregunta ── */
+.es1-question { display: flex; flex-direction: column; gap: 6px; }
+
+.es1-step-tag {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--es1-orange);
+}
+
+.es1-title {
+  font-size: clamp(22px, 2.8vw, 30px);
+  font-weight: 700;
+  color: var(--es1-gray-900);
+  line-height: 1.2;
+}
+
+.es1-subtitle { font-size: 14px; color: var(--es1-gray-500); line-height: 1.5; }
+
+/* ══════════════════════
+   GRID 2×2 + OTROS
+══════════════════════ */
+.es1-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+/* Card genérica */
+.es1-card {
+  position: relative;
+  border: 1.5px solid var(--es1-gray-200);
+  border-radius: 14px;
+  overflow: hidden;
+  background: #fff;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.16s;
+}
+.es1-card:hover    { border-color: var(--es1-gray-400); }
+.es1-card.selected { border-color: var(--es1-gray-900); border-width: 2px; }
+
+/* Image area */
+.es1-card-img-wrap {
+  position: relative;
+  height: 100px;
+  overflow: hidden;
+  background: var(--es1-gray-100);
+}
+.es1-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Checkmark */
+.es1-card-check {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--es1-gray-900);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Label row */
+.es1-card-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--es1-gray-900);
+}
+
+.es1-card-flag { font-size: 14px; }
+
+/* ── "Otros mercados" — full-width ── */
+.es1-card--otros {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  align-items: center;
+  padding: 14px 16px;
+}
+
+.es1-otros-inner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+}
+
+.es1-otros-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--es1-gray-100);
+  color: var(--es1-gray-500);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.es1-otros-text { display: flex; flex-direction: column; gap: 2px; }
+.es1-otros-label { font-size: 13.5px; font-weight: 600; color: var(--es1-gray-900); }
+.es1-otros-sub   { font-size: 12px;   color: var(--es1-gray-500); }
+
+.es1-card-check--otros {
+  position: relative;
+  top: auto;
+  right: auto;
+  flex-shrink: 0;
+}
+
+/* ── Footer ── */
+.es1-footer { display: flex; justify-content: flex-end; }
+
+.es1-btn {
+  padding: 13px 28px;
+  background: var(--es1-green-900);
+  color: #fff;
+  border: none;
+  border-radius: 24px;
+  font-family: var(--es1-font-sans);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s, opacity 0.18s;
+}
+.es1-btn:hover:not(:disabled) { background: var(--es1-green-800); }
+.es1-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ══════════════════════
+   RIGHT — imagen + info card
+══════════════════════ */
+.es1-right {
+  flex-shrink: 0;
+  width: 300px;
+  padding-top: 60px;
+  display: flex;
+  flex-direction: column;
+}
+
+.es1-img-card {
+  width: 100%;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  aspect-ratio: 3 / 4;
+  flex-shrink: 0;
+}
+
+.es1-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Tarjeta "Logística Integrada" */
+.es1-info-card {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: #fff;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  margin-top: -28px;
+  margin-left: 16px;
+  margin-right: 16px;
+  position: relative;
+  z-index: 2;
+}
+
+.es1-info-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--es1-amber-100);
+  color: var(--es1-amber-600);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.es1-info-text { display: flex; flex-direction: column; gap: 4px; }
+.es1-info-title { font-size: 12px; font-weight: 700; color: var(--es1-gray-900); }
+.es1-info-desc  { font-size: 11.5px; color: var(--es1-gray-500); line-height: 1.5; }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .es1-nav  { padding: 14px 20px; }
+  .es1-body { flex-direction: column; padding: 24px 20px; gap: 24px; }
+  .es1-right { display: none; }
+  .es1-footer { justify-content: stretch; }
+  .es1-btn { width: 100%; }
+}

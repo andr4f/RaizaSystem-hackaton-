@@ -11,15 +11,19 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface CertificationMapper {
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "farm", ignore = true)
+    @Mapping(target = "registeredBy", ignore = true)
+    @Mapping(target = "status", ignore = true)
+    @Mapping(target = "registeredAt", ignore = true)
+    @Mapping(target = "documentPath", ignore = true)
     Certification toEntity(CreateCertificationRequest request);
 
+    @Mapping(source = "farm.id", target = "farmId")
     CertificationResponse toResponse(Certification certification);
 
     @Mapping(source = "lot.id", target = "lotId")
     @Mapping(source = "certification.id", target = "certificationId")
     @Mapping(source = "certification.name", target = "certificationName")
+    @Mapping(source = "certification.certificateNumber", target = "certificateNumber")
     LotCertificationResponse toResponse(LotCertification lotCertification);
 }

@@ -1,0 +1,359 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --ps2-green-900: #0d1f0f;
+  --ps2-green-800: #1b3a1f;
+  --ps2-green-600: #16a34a;
+  --ps2-orange:    #d97706;
+  --ps2-gray-100:  #f3f4f6;
+  --ps2-gray-200:  #e5e7eb;
+  --ps2-gray-400:  #9ca3af;
+  --ps2-gray-500:  #6b7280;
+  --ps2-gray-900:  #111827;
+  --ps2-font-sans: 'Inter', -apple-system, system-ui, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ══════════════════════
+   PAGE SHELL
+══════════════════════ */
+.ps2-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  font-family: var(--ps2-font-sans);
+}
+
+/* ══════════════════════
+   NAVBAR
+══════════════════════ */
+.ps2-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 40px;
+  border-bottom: 1px solid var(--ps2-gray-100);
+}
+
+.ps2-nav-logo  { height: 28px; width: auto; display: block; }
+
+.ps2-nav-actions { display: flex; align-items: center; gap: 16px; }
+
+.ps2-nav-text { font-size: 13px; color: var(--ps2-gray-500); }
+
+.ps2-nav-btn {
+  padding: 8px 18px;
+  border: 1.5px solid var(--ps2-gray-200);
+  border-radius: 8px;
+  background: #fff;
+  font-family: var(--ps2-font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ps2-gray-900);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.ps2-nav-btn:hover { background: var(--ps2-gray-100); }
+
+/* ══════════════════════
+   BODY
+══════════════════════ */
+.ps2-body {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  gap: 48px;
+  padding: 32px 40px 0;
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.ps2-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
+}
+
+/* ── Back ── */
+.ps2-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border: 1.5px solid var(--ps2-gray-200);
+  border-radius: 8px;
+  background: #fff;
+  font-family: var(--ps2-font-sans);
+  font-size: 13px;
+  color: var(--ps2-gray-500);
+  cursor: pointer;
+  width: fit-content;
+  transition: background 0.15s;
+}
+.ps2-back:hover { background: var(--ps2-gray-100); }
+
+/* ══════════════════════
+   PROGRESS
+══════════════════════ */
+.ps2-progress {
+  display: flex;
+  align-items: flex-start;
+}
+
+.ps2-progress-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+}
+
+.ps2-progress-item + .ps2-progress-item { margin-left: 48px; }
+
+.ps2-progress-line {
+  position: absolute;
+  top: 14px;
+  right: 50%;
+  width: 100%;
+  height: 2px;
+  background: var(--ps2-gray-200);
+  z-index: 0;
+}
+.ps2-progress-line.done { background: var(--ps2-gray-900); }
+
+.ps2-progress-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--ps2-gray-200);
+  background: #fff;
+  color: var(--ps2-gray-400);
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+.ps2-progress-circle.active,
+.ps2-progress-circle.done {
+  background: var(--ps2-gray-900);
+  border-color: var(--ps2-gray-900);
+  color: #fff;
+}
+
+.ps2-progress-label {
+  font-size: 11px;
+  color: var(--ps2-gray-400);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.ps2-progress-label.active {
+  color: var(--ps2-gray-900);
+  font-weight: 700;
+}
+
+/* ══════════════════════
+   QUESTION
+══════════════════════ */
+.ps2-question {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ps2-step-tag {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ps2-orange);
+}
+
+.ps2-title {
+  font-size: clamp(24px, 2.8vw, 32px);
+  font-weight: 700;
+  color: var(--ps2-gray-900);
+  line-height: 1.15;
+}
+
+.ps2-subtitle {
+  font-size: 14px;
+  color: var(--ps2-gray-500);
+}
+
+/* ── Buscador ── */
+.ps2-search-wrap {
+  position: relative;
+  margin-top: 4px;
+}
+
+.ps2-search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--ps2-gray-400);
+  pointer-events: none;
+}
+
+.ps2-search {
+  width: 100%;
+  max-width: 360px;
+  padding: 11px 14px 11px 38px;
+  border: 1.5px solid var(--ps2-gray-200);
+  border-radius: 10px;
+  font-family: var(--ps2-font-sans);
+  font-size: 13.5px;
+  color: var(--ps2-gray-900);
+  background: #fff;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.ps2-search:focus { border-color: var(--ps2-gray-400); }
+.ps2-search::placeholder { color: var(--ps2-gray-400); }
+
+.ps2-list-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ps2-gray-500);
+}
+
+/* ══════════════════════
+   MUNICIPALITY GRID
+══════════════════════ */
+.ps2-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  max-width: 480px;
+}
+
+.ps2-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1.5px solid var(--ps2-gray-200);
+  border-radius: 12px;
+  background: #fff;
+  cursor: pointer;
+  transition: border-color 0.16s, background 0.16s;
+  font-family: var(--ps2-font-sans);
+}
+
+.ps2-item:hover { border-color: var(--ps2-gray-400); }
+
+.ps2-item.selected {
+  border-color: var(--ps2-gray-900);
+  background: #fff;
+}
+
+/* Thumbnail circular */
+.ps2-item-thumb {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--ps2-gray-100);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ps2-item-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ps2-item-icon { color: var(--ps2-gray-500); }
+
+.ps2-item-label {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ps2-gray-900);
+  text-align: left;
+}
+
+/* Radio button */
+.ps2-radio {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid var(--ps2-gray-300, #d1d5db);
+  flex-shrink: 0;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.ps2-radio.selected {
+  background: var(--ps2-green-600);
+  border-color: var(--ps2-green-600);
+}
+
+/* ══════════════════════
+   RIGHT IMAGE
+══════════════════════ */
+.ps2-right {
+  flex-shrink: 0;
+  width: 300px;
+  padding-top: 40px;
+}
+
+.ps2-img-card {
+  width: 100%;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.14);
+  aspect-ratio: 3 / 4;
+}
+
+.ps2-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ══════════════════════
+   FOOTER — botón centrado
+══════════════════════ */
+.ps2-footer {
+  display: flex;
+  justify-content: center;
+  padding: 32px 40px 40px;
+}
+
+.ps2-btn {
+  padding: 13px 36px;
+  background: var(--ps2-green-900);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-family: var(--ps2-font-sans);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s;
+}
+.ps2-btn:hover { background: var(--ps2-green-800); }
+
+/* ══════════════════════
+   RESPONSIVE
+══════════════════════ */
+@media (max-width: 768px) {
+  .ps2-nav  { padding: 14px 20px; }
+  .ps2-body { flex-direction: column; padding: 24px 20px 0; gap: 24px; }
+  .ps2-right { display: none; }
+  .ps2-grid  { grid-template-columns: repeat(2, 1fr); max-width: 100%; }
+  .ps2-footer { padding: 24px 20px 32px; }
+  .ps2-btn  { width: 100%; max-width: 320px; }
+}

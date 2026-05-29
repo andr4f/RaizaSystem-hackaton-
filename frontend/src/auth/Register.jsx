@@ -13,16 +13,24 @@ const ROLES = [
   { value: 'BUYER',            label: 'Comprador' },
 ]
 
-const Register = () => {
+const ROLE_DASHBOARD = {
+  PRODUCER:         '/dashboard/producer',
+  EXPORTER:         '/dashboard/exporter',
+  TOURISM_OPERATOR: '/dashboard/tourism',
+}
+
+const Register = ({ defaultRole } = {}) => {
   const { register: authRegister } = useAuth()
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
-  const { register, handleSubmit, formState: { errors, isSubmitting }, setError } = useForm()
+  const { register, handleSubmit, formState: { errors, isSubmitting }, setError } = useForm({
+    defaultValues: { role: defaultRole ?? '' },
+  })
 
   const onSubmit = async (data) => {
     try {
       await authRegister(data)
-      navigate('/')
+      navigate(ROLE_DASHBOARD[data.role] ?? '/')
     } catch (err) {
       setError('root', { message: err.message })
     }
@@ -98,22 +106,24 @@ const Register = () => {
               {errors.password && <span className="error-msg">{errors.password.message}</span>}
             </div>
 
-            <div className="input-group">
-              <label>¿Cuál es tu rol?</label>
-              <div className="select-wrapper">
-                <select
-                  {...register('role', { required: 'El rol es requerido' })}
-                  defaultValue=""
-                >
-                  <option value="" disabled>Selecciona tu rol</option>
-                  {ROLES.map((r) => (
-                    <option key={r.value} value={r.value}>{r.label}</option>
-                  ))}
-                </select>
-                <ChevronDown size={17} className="select-icon" />
+            {!defaultRole && (
+              <div className="input-group">
+                <label>¿Cuál es tu rol?</label>
+                <div className="select-wrapper">
+                  <select
+                    {...register('role', { required: 'El rol es requerido' })}
+                    defaultValue=""
+                  >
+                    <option value="" disabled>Selecciona tu rol</option>
+                    {ROLES.map((r) => (
+                      <option key={r.value} value={r.value}>{r.label}</option>
+                    ))}
+                  </select>
+                  <ChevronDown size={17} className="select-icon" />
+                </div>
+                {errors.role && <span className="error-msg">{errors.role.message}</span>}
               </div>
-              {errors.role && <span className="error-msg">{errors.role.message}</span>}
-            </div>
+            )}
 
             {errors.root && <span className="error-msg">{errors.root.message}</span>}
 

@@ -1,5 +1,7 @@
 package com.raiza.demo.tourism.api;
 
+import com.raiza.demo.shared.dto.ReferenceItem;
+import com.raiza.demo.shared.enums.ExperienceType;
 import com.raiza.demo.shared.response.ApiResponse;
 import com.raiza.demo.tourism.dto.*;
 import com.raiza.demo.tourism.service.TourismService;
@@ -21,6 +23,13 @@ import java.util.List;
 public class TourismController {
 
     private final TourismService tourismService;
+
+    // ── Catálogo de referencia (público, para onboarding) ─────────────────
+
+    @GetMapping("/experience-types")
+    public ResponseEntity<ApiResponse<List<ReferenceItem>>> experienceTypes() {
+        return ResponseEntity.ok(ApiResponse.ok(ExperienceType.asItems()));
+    }
 
     // ── Operadores turísticos ─────────────────────────────────────────────
 

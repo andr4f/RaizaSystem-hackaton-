@@ -5,8 +5,11 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 import { AuthProvider } from './app/providers/AuthContext'
 import Home from './pages/Home.jsx'
 import Login from './auth/Login.jsx'
-import Register from './auth/Register.jsx'
 import ProtectedRoute from './auth/ProtectedRoute.jsx'
+import ProducerDashboard from './pages/dashboards/producer/ProducerDashboard.jsx'
+import ExporterDashboard from './pages/dashboards/exporter/ExporterDashboard.jsx'
+import TourismDashboard from './pages/dashboards/tourism/TourismDashboard.jsx'
+import RegisterFlow from './pages/register/RegisterFlow.jsx'
 
 const router = createBrowserRouter([
   {
@@ -15,18 +18,33 @@ const router = createBrowserRouter([
   },
   {
     path: '/register',
-    element: <Register />,
-    
+    element: <RegisterFlow />,
   },
   {
     path: '/',
     element: <Home />,
   },
   {
-    path: '/dashboard',
+    path: '/dashboard/producer',
     element: (
-      <ProtectedRoute>
-        <div>Dashboard</div>
+      <ProtectedRoute allowedRoles={['PRODUCER']}>
+        <ProducerDashboard />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/dashboard/exporter',
+    element: (
+      <ProtectedRoute allowedRoles={['EXPORTER']}>
+        <ExporterDashboard />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/dashboard/tourism',
+    element: (
+      <ProtectedRoute allowedRoles={['TOURISM_OPERATOR']}>
+        <TourismDashboard />
       </ProtectedRoute>
     ),
   },

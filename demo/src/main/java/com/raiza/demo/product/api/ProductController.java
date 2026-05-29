@@ -33,14 +33,18 @@ public class ProductController {
         return ResponseEntity.created(location).body(ApiResponse.created(created));
     }
 
+    // Público — catálogo usado en el onboarding. Soporta ?featured=true y ?category=
     @GetMapping
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<List<ProductResponse>>> findAll() {
+    public ResponseEntity<ApiResponse<List<ProductResponse>>> findAll(
+            @RequestParam(required = false) Boolean featured,
+            @RequestParam(required = false) String category) {
+        if (featured != null || category != null) {
+            return ResponseEntity.ok(ApiResponse.ok(productService.find(featured, category)));
+        }
         return ResponseEntity.ok(ApiResponse.ok(productService.findAll()));
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<ProductResponse>> findById(@PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.ok(productService.findById(id)));
     }
