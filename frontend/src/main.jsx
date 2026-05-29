@@ -17,6 +17,15 @@ import LeadsInbox from './pages/dashboards/producer/sections/LeadsInbox.jsx'
 import Reports from './pages/dashboards/producer/sections/Reports.jsx'
 import Finance from './pages/dashboards/producer/sections/Finance.jsx'
 import ExporterDashboard from './pages/dashboards/exporter/ExporterDashboard.jsx'
+import ExporterHome from './pages/dashboards/exporter/sections/ExporterHome.jsx'
+import ExploreProducts from './pages/dashboards/exporter/sections/ExploreProducts.jsx'
+import VerifiedLots from './pages/dashboards/exporter/sections/VerifiedLots.jsx'
+import ExporterCertifications from './pages/dashboards/exporter/sections/ExporterCertifications.jsx'
+import Opportunities from './pages/dashboards/exporter/sections/Opportunities.jsx'
+import Contacts from './pages/dashboards/exporter/sections/Contacts.jsx'
+import Orders from './pages/dashboards/exporter/sections/Orders.jsx'
+import ExporterReports from './pages/dashboards/exporter/sections/ExporterReports.jsx'
+import ExporterFinance from './pages/dashboards/exporter/sections/ExporterFinance.jsx'
 import TourismDashboard from './pages/dashboards/tourism/TourismDashboard.jsx'
 import RegisterFlow from './pages/register/RegisterFlow.jsx'
 
@@ -59,6 +68,17 @@ const router = createBrowserRouter([
         <ExporterDashboard />
       </ProtectedRoute>
     ),
+    children: [
+      { index: true, element: <ExporterHome /> },
+      { path: 'explorar', element: <ExploreProducts /> },
+      { path: 'lotes', element: <VerifiedLots /> },
+      { path: 'certificaciones', element: <ExporterCertifications /> },
+      { path: 'oportunidades', element: <Opportunities /> },
+      { path: 'contactos', element: <Contacts /> },
+      { path: 'ordenes', element: <Orders /> },
+      { path: 'reportes', element: <ExporterReports /> },
+      { path: 'finanzas', element: <ExporterFinance /> },
+    ],
   },
   {
     path: '/dashboard/tourism',
