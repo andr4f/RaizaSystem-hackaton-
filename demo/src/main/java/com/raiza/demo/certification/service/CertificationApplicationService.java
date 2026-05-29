@@ -156,7 +156,7 @@ public class CertificationApplicationService {
                 // Bloque 4 — Certificación
                 cert.getId(),
                 cert.getName(),
-                cert.getIssuer(),
+                cert.getCertifier().name(),
                 req.producerAnswers(),
                 req.recommendedByAi(),
                 req.missingRequirements(),

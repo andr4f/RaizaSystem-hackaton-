@@ -51,6 +51,7 @@ public class SecurityConfig {
                 // Rutas públicas — sin autenticación
                 .requestMatchers("/public/**").permitAll()
                 .requestMatchers("/api/v1/auth/**").permitAll()
+                .requestMatchers("/api/v1/chat/**").permitAll()
                 .requestMatchers("/actuator/health").permitAll()
                 // Catálogos de referencia del onboarding (solo lectura, pre-registro)
                 .requestMatchers(HttpMethod.GET,

@@ -7,10 +7,10 @@ public record LotCertificationResponse(
         Long lotId,
         Long certificationId,
         String certificationName,
+        String certificateNumber,
         String certificateCode,
         LocalDate validFrom,
         LocalDate validTo,
         String status,
         String evidenceUrl
-) {
-}
+) {}

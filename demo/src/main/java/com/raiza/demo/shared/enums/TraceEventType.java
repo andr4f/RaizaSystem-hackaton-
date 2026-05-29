@@ -3,6 +3,7 @@ package com.raiza.demo.shared.enums;
 public enum TraceEventType {
     LOT_CREATED,
     CULTIVATION_UPDATED,
+    CERTIFICATION_SUBMITTED,
     CERTIFICATION_VALIDATED,
     HARVEST_COMPLETED,
     QUALITY_CHECKED,

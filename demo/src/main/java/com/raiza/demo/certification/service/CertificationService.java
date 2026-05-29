@@ -9,6 +9,8 @@ import com.raiza.demo.certification.entity.LotCertification;
 import com.raiza.demo.certification.mapper.CertificationMapper;
 import com.raiza.demo.certification.repository.CertificationRepository;
 import com.raiza.demo.certification.repository.LotCertificationRepository;
+import com.raiza.demo.farm.entity.Farm;
+import com.raiza.demo.farm.repository.FarmRepository;
 import com.raiza.demo.lot.entity.ProductLot;
 import com.raiza.demo.lot.repository.ProductLotRepository;
 import com.raiza.demo.shared.enums.ActorType;
@@ -33,6 +35,7 @@ public class CertificationService {
     private final CertificationRepository certificationRepository;
     private final LotCertificationRepository lotCertificationRepository;
     private final ProductLotRepository productLotRepository;
+    private final FarmRepository farmRepository;
     private final TraceEventService traceEventService;
     private final CertificationMapper certificationMapper;
 
@@ -53,7 +56,12 @@ public class CertificationService {
         certificationRepository.findByName(request.name()).ifPresent(existing -> {
             throw new DuplicateResourceException("Certification already exists: " + request.name());
         });
-        Certification saved = certificationRepository.save(certificationMapper.toEntity(request));
+        Farm farm = farmRepository.findById(request.farmId())
+                .orElseThrow(() -> ResourceNotFoundException.of("Farm", request.farmId()));
+        Certification certification = certificationMapper.toEntity(request);
+        certification.setFarm(farm);
+        certification.setRegisteredBy("system");
+        Certification saved = certificationRepository.save(certification);
         return certificationMapper.toResponse(saved);
     }
 
@@ -88,8 +96,7 @@ public class CertificationService {
 
         LotCertification saved = lotCertificationRepository.save(link);
 
-        // Solo registra que se subió la evidencia, NO que está validada
-        traceEventService.record(lot, TraceEventType.CERTIFICATION_VALIDATED, ActorType.PRODUCER, null,
+        traceEventService.record(lot, TraceEventType.CERTIFICATION_SUBMITTED, ActorType.PRODUCER, null,
                 "Certification submitted: " + certification.getName(),
                 "Evidence submitted for " + certification.getName() + " — pending validation");
 
