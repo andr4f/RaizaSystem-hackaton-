@@ -61,7 +61,7 @@ INSERT INTO lot_certification (id, lot_id, certification_id, certificate_code, v
 VALUES
 -- Lote 1: certificaciones validadas → exportable
 (1, 1, 1, 'FT-2026-001', '2026-01-01', '2027-01-01', 'VALIDATED',           NULL, 'Documentación verificada', 1, NOW(), NOW(), NOW()),
-(2, 1, 2, 'RA-2026-001', '2026-01-01', '2027-01-01', 'VALIDATED',           NULL, 'Documentación verificada', 1, NOW(), NOW()),
+(2, 1, 2, 'RA-2026-001', '2026-01-01', '2027-01-01', 'VALIDATED',           NULL, 'Documentación verificada', 1, NOW(), NOW(), NOW()),
 -- Lote 2: certificación pendiente de validación
 (3, 2, 1, 'FT-2026-003', '2026-05-01', '2027-05-01', 'PENDING_VALIDATION',  NULL, NULL,                       NULL, NULL,  NOW(), NOW()),
 -- Lote 3: banano con UTZ validado
