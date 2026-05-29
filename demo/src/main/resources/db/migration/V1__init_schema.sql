@@ -8,14 +8,17 @@
 -- app_user (internal dashboard users)
 -- ---------------------------------------------------------------------
 CREATE TABLE app_user (
-    id          BIGSERIAL PRIMARY KEY,
-    name        VARCHAR(150) NOT NULL,
-    email       VARCHAR(120) NOT NULL UNIQUE,
-    password    VARCHAR(255) NOT NULL,
-    role        VARCHAR(30)  NOT NULL,
-    active      BOOLEAN      NOT NULL DEFAULT TRUE,
-    created_at  TIMESTAMP    NOT NULL DEFAULT now(),
-    updated_at  TIMESTAMP
+    id                    BIGSERIAL PRIMARY KEY,
+    name                  VARCHAR(150) NOT NULL,
+    email                 VARCHAR(120) NOT NULL UNIQUE,
+    password              VARCHAR(255) NOT NULL,
+    role                  VARCHAR(30)  NOT NULL,
+    active                BOOLEAN      NOT NULL DEFAULT TRUE,
+    onboarding_completed  BOOLEAN      NOT NULL DEFAULT FALSE,
+    profile_id            BIGINT,
+    profile_type          VARCHAR(30),
+    created_at            TIMESTAMP    NOT NULL DEFAULT now(),
+    updated_at            TIMESTAMP
 );
 
 -- ---------------------------------------------------------------------
@@ -166,8 +169,11 @@ CREATE TABLE lot_certification (
     certificate_code VARCHAR(80),
     valid_from       DATE,
     valid_to         DATE,
-    status           VARCHAR(30),
+    status           VARCHAR(30) NOT NULL DEFAULT 'PENDING_VALIDATION',
     evidence_url     TEXT,
+    validation_notes TEXT,
+    validated_by     BIGINT,
+    validated_at     TIMESTAMP,
     created_at       TIMESTAMP NOT NULL DEFAULT now(),
     updated_at       TIMESTAMP
 );
@@ -264,3 +270,29 @@ CREATE TABLE export_review (
 );
 CREATE INDEX idx_export_review_lead_id     ON export_review (lead_id);
 CREATE INDEX idx_export_review_exporter_id ON export_review (exporter_id);
+
+-- ---------------------------------------------------------------------
+-- certification_application (-> producer, farm, product_lot, certification)
+-- Solicitud de certificación con payload JSON para regenerar el PDF.
+-- ---------------------------------------------------------------------
+CREATE TABLE certification_application (
+    id                BIGSERIAL PRIMARY KEY,
+    application_code  VARCHAR(40)  NOT NULL UNIQUE,
+    producer_id       BIGINT       NOT NULL REFERENCES producer (id),
+    farm_id           BIGINT       NOT NULL REFERENCES farm (id),
+    lot_id            BIGINT       NOT NULL REFERENCES product_lot (id),
+    certification_id  BIGINT       NOT NULL REFERENCES certification (id),
+    status            VARCHAR(30)  NOT NULL DEFAULT 'DRAFT',
+    payload_json      TEXT         NOT NULL,
+    pdf_path          VARCHAR(255),
+    destination_email VARCHAR(120),
+    recommended_by_ai BOOLEAN,
+    review_notes      TEXT,
+    reviewed_by       BIGINT,
+    created_at        TIMESTAMP    NOT NULL DEFAULT now(),
+    updated_at        TIMESTAMP
+);
+CREATE INDEX idx_certification_application_producer_id      ON certification_application (producer_id);
+CREATE INDEX idx_certification_application_lot_id           ON certification_application (lot_id);
+CREATE INDEX idx_certification_application_certification_id ON certification_application (certification_id);
+CREATE INDEX idx_certification_application_status           ON certification_application (status);

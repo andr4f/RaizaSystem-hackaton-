@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<title>Origen Magdalena — Flujo del Backend</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: #1b2a1f; font-size: 12px; line-height: 1.5;
+  }
+  h1 { font-size: 26px; color: #1b4332; }
+  h2 {
+    font-size: 18px; color: #fff; background: #2d6a4f;
+    padding: 7px 12px; border-radius: 5px; margin: 26px 0 12px;
+  }
+  h3 { font-size: 14px; color: #1b4332; margin: 16px 0 6px;
+       border-bottom: 2px solid #b7e4c7; padding-bottom: 3px; }
+  p { margin: 6px 0; }
+  .muted { color: #6c757d; }
+  .page-break { page-break-before: always; }
+  ul { margin: 6px 0 6px 18px; }
+  li { margin: 3px 0; }
+  code { background: #f1f8f4; padding: 1px 5px; border-radius: 3px;
+         font-family: Consolas, monospace; font-size: 11px; color: #1b4332; }
+
+  /* Portada */
+  .cover { text-align: center; padding: 60px 0 30px; border-bottom: 4px solid #2d6a4f; }
+  .cover .badge { display:inline-block; background:#e9c46a; color:#1b2a1f;
+    padding:4px 14px; border-radius:999px; font-weight:bold; font-size:11px; margin-bottom:18px; }
+  .cover h1 { font-size: 34px; }
+  .cover .sub { font-size: 15px; color:#6c757d; margin-top:8px; }
+
+  table { width:100%; border-collapse: collapse; margin: 10px 0; font-size: 11px; }
+  th { background:#1b4332; color:#fff; padding:6px 8px; text-align:left; }
+  td { border:1px solid #cfe3d6; padding:5px 8px; vertical-align: top; }
+  tr:nth-child(even) td { background:#f6fbf8; }
+
+  /* Diagrama de capas */
+  .layer { border:2px solid #2d6a4f; border-radius:6px; padding:8px 12px; margin:6px 0;
+           background:#f6fbf8; }
+  .layer .lt { font-weight:bold; color:#1b4332; }
+  .arrow-down { text-align:center; color:#2d6a4f; font-size:16px; font-weight:bold; }
+
+  /* Carriles de actores */
+  .lane { border-left:6px solid; border-radius:5px; padding:8px 12px; margin:8px 0;
+          background:#fafdfb; }
+  .lane.prod { border-color:#2d6a4f; }
+  .lane.tour { border-color:#e76f51; }
+  .lane.buyer { border-color:#457b9d; }
+  .lane.exp { border-color:#9d4edd; }
+  .lane.admin { border-color:#e9c46a; }
+  .lane .who { font-weight:bold; font-size:13px; margin-bottom:4px; }
+  .lane.prod .who { color:#2d6a4f; }
+  .lane.tour .who { color:#e76f51; }
+  .lane.buyer .who { color:#457b9d; }
+  .lane.exp .who { color:#9d4edd; }
+  .lane.admin .who { color:#b8860b; }
+
+  .step { background:#fff; border:1px solid #cfe3d6; border-radius:4px;
+          padding:5px 9px; margin:4px 0; }
+  .step b { color:#1b4332; }
+  .ev { display:inline-block; background:#2d6a4f; color:#fff; font-size:9px;
+        padding:1px 6px; border-radius:3px; font-family:monospace; }
+
+  .pill { display:inline-block; padding:2px 8px; border-radius:999px; font-size:10px;
+          font-weight:bold; color:#fff; }
+  .p-pending { background:#f4a261; }
+  .p-avail { background:#2d6a4f; }
+  .p-review { background:#9d4edd; }
+  .p-sold { background:#457b9d; }
+
+  .box { border:1px solid #cfe3d6; border-radius:6px; padding:10px 12px; margin:8px 0;
+         background:#fafdfb; }
+  .ok { color:#2d6a4f; font-weight:bold; }
+  .miss { color:#c1121f; font-weight:bold; }
+  .warn { color:#e76f51; font-weight:bold; }
+
+  .hashchain { font-family:monospace; font-size:10px; background:#1b2a1f; color:#b7e4c7;
+               padding:10px; border-radius:6px; line-height:1.7; }
+  .legend span { display:inline-block; margin-right:14px; font-size:10px; }
+  .dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:4px;
+         vertical-align:middle; }
+</style>
+</head>
+<body>
+
+<!-- ========================= PORTADA ========================= -->
+<div class="cover">
+  <div class="badge">HACKATHON REGIONAL MAGDALENA · COLOMBIA 5.0</div>
+  <h1>Origen Magdalena</h1>
+  <div class="sub">Sistema de Trazabilidad Digital Inteligente Agro-Turística</div>
+  <div class="sub">Documento técnico del flujo del backend · Spring Boot + PostgreSQL</div>
+  <p class="muted" style="margin-top:24px;">Guía para el equipo — qué hace cada componente y cómo se conecta todo</p>
+</div>
+
+<h2>1. El reto y cómo lo cubrimos</h2>
+<p>El reto pide un sistema que <b>conecte</b> la trazabilidad agrícola de exportación con la experiencia
+turística y el comprador internacional, bajo los estándares <b>Fairtrade</b> y <b>Rainforest Alliance</b>.
+Se estructura en 3 pilares:</p>
+
+<table>
+  <tr><th style="width:28%">Pilar del reto</th><th style="width:42%">Qué exige</th><th style="width:30%">Cómo lo cubre el backend</th></tr>
+  <tr>
+    <td><b>1. Trazabilidad para exportación</b></td>
+    <td>Registrar de forma transparente, <b>inmutable y verificable</b> el origen, condiciones de cultivo y cumplimiento de sellos.</td>
+    <td class="ok">✓ Cubierto — módulos producer, farm, lot, certification + cadena de hash SHA-256 en trace_event</td>
+  </tr>
+  <tr>
+    <td><b>2. Vinculación turística</b></td>
+    <td>Un turista escanea un código QR, conoce la historia del agricultor, verifica el cultivo y adquiere el producto.</td>
+    <td class="ok">✓ Cubierto — módulo tourism + vista pública QR sin login</td>
+  </tr>
+  <tr>
+    <td><b>3. Cadena de valor unificada</b></td>
+    <td>Flujo digital continuo: productor → operador turístico → exportador → comprador.</td>
+    <td class="ok">✓ Cubierto — módulos lead, exporter conectan los 4 actores</td>
+  </tr>
+</table>
+
+<div class="box">
+  <p><b class="warn">⚠ Brecha frente a la rúbrica:</b> La <b>Innovación (20%)</b> exige IA como componente central
+  — el documento dice textualmente que "la ausencia de IA como componente central limita este criterio a máximo 50 puntos".
+  Hoy el backend <b class="miss">no tiene ningún endpoint de IA</b>. Ver sección 9.</p>
+</div>
+
+<h2>2. Arquitectura general — monolito modular en capas</h2>
+<p>Una sola aplicación Spring Boot, organizada por <b>módulos de dominio</b>. Cada petición atraviesa estas capas:</p>
+
+<div class="layer"><span class="lt">CLIENTE</span> — React (dashboard interno) + vista pública QR (móvil)</div>
+<div class="arrow-down">▼ HTTP / REST JSON · Bearer JWT</div>
+<div class="layer"><span class="lt">SEGURIDAD</span> — JwtAuthenticationFilter valida el token y carga el usuario · SecurityConfig define rutas públicas vs protegidas</div>
+<div class="arrow-down">▼</div>
+<div class="layer"><span class="lt">CONTROLLER (api/)</span> — recibe la petición, valida con @Valid, aplica @PreAuthorize por rol, devuelve ApiResponse</div>
+<div class="arrow-down">▼</div>
+<div class="layer"><span class="lt">SERVICE</span> — la lógica de negocio: reglas, transacciones, dispara eventos de trazabilidad</div>
+<div class="arrow-down">▼</div>
+<div class="layer"><span class="lt">REPOSITORY (JPA)</span> — acceso a datos · MAPPER (MapStruct) — convierte entidad ↔ DTO</div>
+<div class="arrow-down">▼ JDBC</div>
+<div class="layer"><span class="lt">PostgreSQL</span> — esquema gestionado por Flyway · 16 tablas</div>
+
+<p class="muted" style="margin-top:8px;">Regla clave: el controller nunca expone entidades, solo DTOs. La lógica vive en el service, no en el controller.</p>
+
+<!-- ========================= ACTORES ========================= -->
+<div class="page-break"></div>
+<h2>3. Los actores y qué ve cada uno</h2>
+<p>5 roles. El token JWT lleva el rol, y <code>@PreAuthorize</code> en cada endpoint controla el acceso.</p>
+
+<div class="legend" style="margin:8px 0;">
+  <span><span class="dot" style="background:#2d6a4f"></span>PRODUCER</span>
+  <span><span class="dot" style="background:#e76f51"></span>TOURISM_OPERATOR</span>
+  <span><span class="dot" style="background:#457b9d"></span>BUYER / TURISTA</span>
+  <span><span class="dot" style="background:#9d4edd"></span>EXPORTER</span>
+  <span><span class="dot" style="background:#e9c46a"></span>ADMIN</span>
+</div>
+
+<table>
+  <tr><th>Actor</th><th>Qué hace en el sistema</th><th>Qué NO ve</th></tr>
+  <tr><td><b style="color:#2d6a4f">PRODUCER</b></td><td>Registra finca y lotes, sube evidencia de certificación, registra eventos de cultivo/cosecha.</td><td>Datos de otros productores, leads comerciales, exportadores.</td></tr>
+  <tr><td><b style="color:#e76f51">TOURISM_OPERATOR</b></td><td>Crea experiencias, vincula lotes certificados, genera QR público.</td><td>Leads internos, revisiones de exportación.</td></tr>
+  <tr><td><b style="color:#457b9d">BUYER / TURISTA</b></td><td>Escanea QR (sin login), ve la historia del lote, deja intención de compra.</td><td>Todo lo interno del sistema.</td></tr>
+  <tr><td><b style="color:#9d4edd">EXPORTER</b></td><td>Ve leads, verifica trazabilidad y certificaciones, crea revisión de exportación.</td><td>Datos internos de otros exportadores.</td></tr>
+  <tr><td><b style="color:#b8860b">ADMIN</b></td><td>Gestiona catálogos (productos, certificaciones), valida certificaciones, supervisa todo.</td><td>—</td></tr>
+</table>
+
+<h2>4. El flujo completo de punta a punta</h2>
+<p>Así se conectan los 4 actores en una sola cadena digital. Las etiquetas <span class="ev">EVENTO</span> son eventos de trazabilidad que el sistema graba automáticamente.</p>
+
+<div class="lane prod">
+  <div class="who">① PRODUCTOR — genera el producto</div>
+  <div class="step">Registra <b>productor</b> y <b>finca</b> (origen territorial)</div>
+  <div class="step">Crea <b>lote</b> de café/banano/cacao → nace en <span class="pill p-pending">CERTIFICATION_PENDING</span> &nbsp;<span class="ev">LOT_CREATED</span></div>
+  <div class="step">Registra eventos del cultivo &nbsp;<span class="ev">HARVEST_COMPLETED</span> <span class="ev">QUALITY_CHECKED</span></div>
+  <div class="step">Sube evidencia de certificación (Fairtrade / Rainforest Alliance) → <span class="pill p-pending">PENDING_VALIDATION</span></div>
+</div>
+<div class="arrow-down">▼</div>
+<div class="lane admin">
+  <div class="who">② ADMIN — valida el cumplimiento</div>
+  <div class="step">Revisa y valida la certificación → <b>VALIDATED</b> &nbsp;<span class="ev">CERTIFICATION_VALIDATED</span></div>
+  <div class="step">El lote pasa automáticamente a <span class="pill p-avail">AVAILABLE</span> (ya es exportable y visible)</div>
+</div>
+<div class="arrow-down">▼</div>
+<div class="lane tour">
+  <div class="who">③ OPERADOR TURÍSTICO — activa la experiencia</div>
+  <div class="step">Crea una <b>experiencia</b> ("Cata de café en Minca") con su <b>QR único</b></div>
+  <div class="step">Vincula el lote certificado a la experiencia &nbsp;<span class="ev">TOURISM_LINKED</span></div>
+</div>
+<div class="arrow-down">▼</div>
+<div class="lane buyer">
+  <div class="who">④ TURISTA / COMPRADOR — descubre y compra</div>
+  <div class="step">Escanea el <b>QR</b> en Santa Marta → ve productor, finca, certificaciones y timeline &nbsp;<span class="ev">QR_SCANNED</span></div>
+  <div class="step">Deja una <b>intención de compra</b> (lead) → <span class="pill p-pending">NEW</span> &nbsp;<span class="ev">PURCHASE_INTENT_CREATED</span></div>
+</div>
+<div class="arrow-down">▼</div>
+<div class="lane exp">
+  <div class="who">⑤ EXPORTADOR — cierra la oportunidad comercial</div>
+  <div class="step">Recibe el lead, verifica la trazabilidad y certificaciones validadas</div>
+  <div class="step">Crea <b>revisión de exportación</b> (incoterm, fecha estimada) &nbsp;<span class="ev">EXPORT_REVIEWED</span></div>
+  <div class="step">El lote pasa a <span class="pill p-review">IN_EXPORT_REVIEW</span> → al cerrar: <span class="pill p-sold">SOLD</span></div>
+</div>
+
+<!-- ========================= MÓDULOS ========================= -->
+<div class="page-break"></div>
+<h2>5. Qué hace cada módulo del backend</h2>
+<table>
+  <tr><th style="width:18%">Módulo</th><th style="width:30%">Responsabilidad</th><th style="width:52%">Entidades / lógica clave</th></tr>
+  <tr><td><b>auth</b></td><td>Login y emisión del JWT</td><td>AppUser · genera token con rol, userId y nombre como claims</td></tr>
+  <tr><td><b>security</b></td><td>Filtro JWT, reglas de rutas, manejo de 401/403</td><td>JwtService, JwtAuthenticationFilter, SecurityConfig, UserPrincipal</td></tr>
+  <tr><td><b>producer</b></td><td>Productores y asociaciones</td><td>Producer · valida documento duplicado</td></tr>
+  <tr><td><b>farm</b></td><td>Fincas de origen</td><td>Farm · ligada a un productor, coordenadas, altitud</td></tr>
+  <tr><td><b>product</b></td><td>Catálogo de productos</td><td>Product · café, banano, cacao con unidad de medida</td></tr>
+  <tr><td><b>lot</b></td><td><b>Núcleo del sistema</b> — la unidad trazable</td><td>ProductLot · genera código único MGD-AÑO-XXXXXX y valor QR; nace CERTIFICATION_PENDING</td></tr>
+  <tr><td><b>certification</b></td><td>Certificaciones, validación y solicitud PDF</td><td>Certification, LotCertification (con estado de validación), CertificationApplication (genera PDF)</td></tr>
+  <tr><td><b>traceability</b></td><td>Línea de tiempo inmutable del lote</td><td>TraceEvent · cadena de hash SHA-256 (cada evento firma al anterior)</td></tr>
+  <tr><td><b>tourism</b></td><td>Operadores, experiencias y QR</td><td>TourismOperator, TourismExperience (con qr_slug), ExperienceLot</td></tr>
+  <tr><td><b>buyer</b></td><td>Compradores y turistas</td><td>Buyer · upsert por email (crea o reutiliza)</td></tr>
+  <tr><td><b>lead</b></td><td>Intenciones de compra</td><td>PurchaseLead · creado desde el QR público</td></tr>
+  <tr><td><b>exporter</b></td><td>Exportadores y revisión comercial</td><td>Exporter, ExportReview · cambia estado de lead y lote</td></tr>
+  <tr><td><b>publicview</b></td><td>Vista pública sin login (la pantalla estrella)</td><td>PublicTraceService · arma historia completa del lote para el QR</td></tr>
+</table>
+
+<h2>6. Máquinas de estado</h2>
+
+<h3>Estado del lote (LotStatus)</h3>
+<div class="hashchain" style="background:#f6fbf8; color:#1b4332;">
+CERTIFICATION_PENDING ──► AVAILABLE ──► RESERVED ──► IN_EXPORT_REVIEW ──► SOLD<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└──► INACTIVE
+</div>
+<p class="muted">Transiciones automáticas: crear lote → PENDING · admin valida certificación → AVAILABLE · exportador crea revisión → IN_EXPORT_REVIEW.</p>
+
+<h3>Estado de validación de certificación</h3>
+<div class="hashchain" style="background:#f6fbf8; color:#1b4332;">
+PENDING_VALIDATION ──► CONDITIONALLY_VALID ──► VALIDATED<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└──► REJECTED &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└──► EXPIRED
+</div>
+<p class="muted">Regla de negocio clave: <b>el lote NO es exportable hasta que su certificación esté validada</b>. "Registro abierto, comercialización restringida por cumplimiento".</p>
+
+<h3>Estado del lead (LeadStatus)</h3>
+<div class="hashchain" style="background:#f6fbf8; color:#1b4332;">
+NEW ──► CONTACTED ──► QUALIFIED ──► IN_EXPORT_REVIEW ──► CLOSED_WON<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└──► CLOSED_LOST
+</div>
+
+<!-- ========================= HASH CHAIN ========================= -->
+<div class="page-break"></div>
+<h2>7. La trazabilidad inmutable — cadena de hash</h2>
+<p>Cada <code>TraceEvent</code> firma criptográficamente al anterior con <b>SHA-256</b>. Esto es lo que demuestra
+"inmutable y verificable" ante el jurado (Pilar 1) y aporta el componente tipo blockchain sin la complejidad de una blockchain real.</p>
+
+<div class="hashchain">
+Evento 1 (LOT_CREATED)<br/>
+&nbsp;&nbsp;previousHash = "GENESIS"<br/>
+&nbsp;&nbsp;hashValue = SHA256("lotId|LOT_CREATED|fecha|PRODUCER|...|GENESIS") = <b>a3f9c2...</b><br/>
+<br/>
+Evento 2 (HARVEST_COMPLETED)<br/>
+&nbsp;&nbsp;previousHash = <b>a3f9c2...</b> &nbsp;← toma el hash del evento 1<br/>
+&nbsp;&nbsp;hashValue = SHA256("...|a3f9c2...") = <b>7b4e1d...</b><br/>
+<br/>
+Evento 3 (QUALITY_CHECKED)<br/>
+&nbsp;&nbsp;previousHash = <b>7b4e1d...</b> &nbsp;← encadena al evento 2<br/>
+&nbsp;&nbsp;hashValue = SHA256("...|7b4e1d...") = <b>9c2a8f...</b>
+</div>
+<p style="margin-top:8px;">Si alguien altera el evento 2, su hash cambia, lo que rompe el 3, el 4, y toda la cadena. <b>La manipulación es detectable.</b></p>
+
+<p><b>11 tipos de evento</b> — 7 se graban automáticamente cuando el actor usa la plataforma:</p>
+<table>
+  <tr><th>Evento</th><th>Cuándo se dispara</th><th>Automático</th></tr>
+  <tr><td>LOT_CREATED</td><td>Al crear el lote</td><td class="ok">Sí</td></tr>
+  <tr><td>HARVEST_COMPLETED</td><td>El productor registra la cosecha</td><td>Manual</td></tr>
+  <tr><td>QUALITY_CHECKED</td><td>Control de calidad</td><td>Manual</td></tr>
+  <tr><td>CERTIFICATION_VALIDATED</td><td>Al subir evidencia y al validar el admin</td><td class="ok">Sí</td></tr>
+  <tr><td>TOURISM_LINKED</td><td>Al vincular lote a experiencia</td><td class="ok">Sí</td></tr>
+  <tr><td>QR_SCANNED</td><td>Al escanear el QR público</td><td class="ok">Sí</td></tr>
+  <tr><td>PURCHASE_INTENT_CREATED</td><td>Al crear un lead</td><td class="ok">Sí</td></tr>
+  <tr><td>EXPORT_REVIEWED</td><td>Al crear revisión de exportación</td><td class="ok">Sí</td></tr>
+  <tr><td>LOT_RESERVED</td><td>Al reservar el lote</td><td class="ok">Sí</td></tr>
+</table>
+
+<h2>8. Endpoints implementados (38 en 10 controllers)</h2>
+<table>
+  <tr><th>Grupo</th><th>Endpoints principales</th><th>Acceso</th></tr>
+  <tr><td><b>Auth</b></td><td>POST /api/v1/auth/login</td><td>Público</td></tr>
+  <tr><td><b>Productores</b></td><td>POST/GET /producers · GET /{id}/farms · POST /{id}/farms</td><td>ADMIN, PRODUCER</td></tr>
+  <tr><td><b>Lotes</b></td><td>POST/GET /lots · GET /{id} · PATCH /{id}/status · GET /{id}/traceability · POST/GET /{id}/events · POST/GET /{id}/certifications</td><td>según rol</td></tr>
+  <tr><td><b>Certificación</b></td><td>GET /certifications · PATCH /lot-certifications/{id}/validate · POST /certification-applications · GET /{id}/pdf</td><td>ADMIN / PRODUCER</td></tr>
+  <tr><td><b>Turismo</b></td><td>POST/GET /tourism/operators · POST/GET /tourism/experiences · POST /experiences/{id}/lots/{lotId}</td><td>ADMIN, TOURISM_OPERATOR</td></tr>
+  <tr><td><b>Leads</b></td><td>GET /leads · PATCH /{id}/status · POST/GET /{id}/export-review</td><td>ADMIN, EXPORTER</td></tr>
+  <tr><td><b>Exportadores</b></td><td>POST/GET /exporters · GET /{id}/reviews</td><td>ADMIN, EXPORTER</td></tr>
+  <tr><td><b>Público (QR)</b></td><td>GET /public/trace/{qrSlug} · POST /scan · POST /lead · GET /public/experiences/{slug}</td><td class="ok">Sin login</td></tr>
+</table>
+
+<!-- ========================= GAPS ========================= -->
+<div class="page-break"></div>
+<h2>9. Qué falta — prioridad para la demo</h2>
+
+<div class="box">
+  <p><b class="miss">🔴 CRÍTICO 1 — Migración Flyway desactualizada (bloquea el arranque)</b></p>
+  <p>El <code>V1__init_schema.sql</code> NO incluye lo que agregamos después: la tabla <code>certification_application</code>,
+  la columna <code>app_user.onboarding_completed</code>, ni las columnas <code>validation_notes / validated_by / validated_at</code>
+  de <code>lot_certification</code>. Como <code>ddl-auto=validate</code>, <b>la app no arranca contra una BD limpia</b>.</p>
+  <p class="muted">Solución: actualizar V1 (si la BD está vacía) o crear V2__add_certification_application.sql.</p>
+</div>
+
+<div class="box">
+  <p><b class="miss">🔴 CRÍTICO 2 — Sin endpoints de IA</b></p>
+  <p>Innovación pesa 20% y el reto exige IA central. Faltan, según lo que ya definió el equipo:</p>
+  <ul>
+    <li><code>POST /api/v1/ai/certification-guide</code> — guía paso a paso para el campesino (qué certificación necesita y cómo obtenerla)</li>
+    <li><code>POST /api/v1/ai/onboarding</code> — wizard introductorio según el rol</li>
+    <li><code>POST /api/v1/ai/validate-certification</code> — pre-validación automática de certificaciones</li>
+    <li><code>GET /api/v1/lots/{id}/ai-summary</code> — explicación del lote para el comprador</li>
+  </ul>
+  <p class="muted">Requiere integrar Anthropic Claude API. Es el mayor diferenciador del pitch.</p>
+</div>
+
+<div class="box">
+  <p><b class="warn">🟡 IMPORTANTE — Datos de demo (seed)</b></p>
+  <p>No hay V2/V3 con datos. Sin seed, el jurado ve pantallas vacías. Se necesita: catálogo de productos y certificaciones,
+  usuarios por rol, y un lote demo con eventos ya cargados.</p>
+</div>
+
+<div class="box">
+  <p><b class="warn">🟡 OPCIONAL — Endpoint de métricas/dashboard</b></p>
+  <p>El criterio de Impacto (20%) pide "indicadores concretos: número de productores, lotes trazados, leads generados".
+  Un endpoint <code>GET /api/v1/dashboard/metrics</code> daría números directos para el pitch.</p>
+</div>
+
+<h3>Resumen de avance</h3>
+<table>
+  <tr><th>Componente</th><th>Estado</th></tr>
+  <tr><td>Entidades, repositorios, servicios</td><td class="ok">100% ✓</td></tr>
+  <tr><td>Seguridad JWT + roles</td><td class="ok">100% ✓</td></tr>
+  <tr><td>Controllers REST (38 endpoints)</td><td class="ok">100% ✓ del flujo base</td></tr>
+  <tr><td>Cadena de trazabilidad (hash)</td><td class="ok">100% ✓</td></tr>
+  <tr><td>PDF de solicitud de certificación</td><td class="ok">100% ✓</td></tr>
+  <tr><td>Migración Flyway actualizada</td><td class="miss">Pendiente — bloquea arranque</td></tr>
+  <tr><td>Endpoints de IA</td><td class="miss">0% — crítico para Innovación</td></tr>
+  <tr><td>Datos de demo</td><td class="miss">0%</td></tr>
+</table>
+
+<p style="margin-top:18px; text-align:center;" class="muted">
+Origen Magdalena · Documento generado para el equipo · El backend cubre los 3 pilares del reto a nivel de flujo;
+los bloqueantes son la migración Flyway y la capa de IA.
+</p>
+
+</body>
+</html>

@@ -11,6 +11,7 @@ import com.raiza.demo.lead.repository.PurchaseLeadRepository;
 import com.raiza.demo.lot.entity.ProductLot;
 import com.raiza.demo.lot.service.ProductLotService;
 import com.raiza.demo.shared.enums.ActorType;
+import com.raiza.demo.shared.enums.BuyerType;
 import com.raiza.demo.shared.enums.LeadStatus;
 import com.raiza.demo.shared.enums.TraceEventType;
 import com.raiza.demo.shared.exception.ResourceNotFoundException;
@@ -42,6 +43,11 @@ public class PurchaseLeadService {
     }
 
     @Transactional(readOnly = true)
+    public LeadResponse findById(Long id) {
+        return leadMapper.toResponse(getLeadOrThrow(id));
+    }
+
+    @Transactional(readOnly = true)
     public List<LeadResponse> findByStatus(LeadStatus status) {
         return purchaseLeadRepository.findByLeadStatus(status).stream()
                 .map(leadMapper::toResponse)
@@ -51,6 +57,13 @@ public class PurchaseLeadService {
     @Transactional(readOnly = true)
     public List<LeadResponse> findByLot(Long lotId) {
         return purchaseLeadRepository.findByLotId(lotId).stream()
+                .map(leadMapper::toResponse)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<LeadResponse> findByProducer(Long producerId) {
+        return purchaseLeadRepository.findByLot_Producer_IdOrderByCreatedAtDesc(producerId).stream()
                 .map(leadMapper::toResponse)
                 .toList();
     }
@@ -71,7 +84,7 @@ public class PurchaseLeadService {
         lead.setUnitOfMeasure(request.unitOfMeasure());
         lead.setDestinationCountry(request.destinationCountry());
         lead.setMessage(request.message());
-        lead.setLeadStatus(LeadStatus.NEW);
+        lead.setLeadStatus(isCommercialBuyer(request.buyerType()) ? LeadStatus.IN_EXPORT_REVIEW : LeadStatus.NEW);
         PurchaseLead saved = purchaseLeadRepository.save(lead);
 
         traceEventService.record(lot, TraceEventType.PURCHASE_INTENT_CREATED, ActorType.BUYER, buyer.getId(),
@@ -92,5 +105,12 @@ public class PurchaseLeadService {
     public PurchaseLead getLeadOrThrow(Long id) {
         return purchaseLeadRepository.findById(id)
                 .orElseThrow(() -> ResourceNotFoundException.of("PurchaseLead", id));
+    }
+
+    private boolean isCommercialBuyer(BuyerType buyerType) {
+        return buyerType == BuyerType.IMPORTER
+                || buyerType == BuyerType.ROASTER
+                || buyerType == BuyerType.DISTRIBUTOR
+                || buyerType == BuyerType.HOTEL;
     }
 }

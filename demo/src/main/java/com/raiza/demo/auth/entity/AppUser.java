@@ -32,4 +32,12 @@ public class AppUser extends BaseEntity {
 
     @Column(name = "onboarding_completed", nullable = false)
     private boolean onboardingCompleted = false;
+
+    // Enlace a la entidad de dominio que representa este usuario
+    // (Producer / Exporter / TourismOperator / Buyer). El tipo lo indica profileType.
+    @Column(name = "profile_id")
+    private Long profileId;
+
+    @Column(name = "profile_type", length = 30)
+    private String profileType;
 }
