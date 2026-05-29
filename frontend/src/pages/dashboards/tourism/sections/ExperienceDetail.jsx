@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { ChevronLeft, MapPin, QrCode, Link2, Package } from 'lucide-react'
 import { useTourismData } from '../useTourismData'
 import { tourismApi } from '../../../../shared/api/tourismApi'
-import { publicTraceApi } from '../../../../shared/api/publicTraceApi'
+import { publicExperienceApi } from '../../../../shared/api/publicExperienceApi'
 import './sections.css'
 
 const ExperienceDetail = () => {
@@ -52,7 +52,7 @@ const ExperienceDetail = () => {
     )
   }
 
-  const qrUrl = experience.qrSlug ? publicTraceApi.publicUrl(experience.qrSlug) : null
+  const qrUrl = experience.qrSlug ? publicExperienceApi.experiencePublicUrl(experience.qrSlug) : null
 
   return (
     <div className="tsec">

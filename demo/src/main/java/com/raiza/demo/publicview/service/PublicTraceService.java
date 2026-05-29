@@ -6,9 +6,11 @@ import com.raiza.demo.farm.entity.Farm;
 import com.raiza.demo.lot.entity.ProductLot;
 import com.raiza.demo.lot.repository.ProductLotRepository;
 import com.raiza.demo.producer.entity.Producer;
+import com.raiza.demo.producer.repository.ProducerRepository;
 import com.raiza.demo.product.entity.Product;
 import com.raiza.demo.publicview.dto.PublicCertificationItem;
 import com.raiza.demo.publicview.dto.PublicExperienceResponse;
+import com.raiza.demo.publicview.dto.PublicProducerResponse;
 import com.raiza.demo.publicview.dto.PublicTimelineEvent;
 import com.raiza.demo.publicview.dto.PublicTraceResponse;
 import com.raiza.demo.shared.exception.ResourceNotFoundException;
@@ -33,6 +35,7 @@ public class PublicTraceService {
     private final TraceEventRepository traceEventRepository;
     private final TourismExperienceRepository tourismExperienceRepository;
     private final ExperienceLotRepository experienceLotRepository;
+    private final ProducerRepository producerRepository;
 
     @Transactional(readOnly = true)
     public PublicTraceResponse getByQrCode(String qrCodeValue) {
@@ -46,6 +49,13 @@ public class PublicTraceService {
         ProductLot lot = productLotRepository.findByLotCode(lotCode)
                 .orElseThrow(() -> ResourceNotFoundException.of("Lot code", lotCode));
         return buildTrace(lot);
+    }
+
+    @Transactional(readOnly = true)
+    public PublicProducerResponse getProducerById(Long producerId) {
+        Producer producer = producerRepository.findById(producerId)
+                .orElseThrow(() -> ResourceNotFoundException.of("Producer", producerId));
+        return toProducerResponse(producer);
     }
 
     @Transactional(readOnly = true)
@@ -84,6 +94,8 @@ public class PublicTraceService {
                 .toList();
 
         return new PublicTraceResponse(
+                lot.getId(),
+                producer.getId(),
                 lot.getLotCode(),
                 lot.getQrCodeValue(),
                 lot.getStatus(),
@@ -133,5 +145,17 @@ public class PublicTraceService {
                 event.getMetricUnit(),
                 event.getHashValue(),
                 event.getPreviousHash());
+    }
+
+    private PublicProducerResponse toProducerResponse(Producer producer) {
+        return new PublicProducerResponse(
+                producer.getId(),
+                producer.getName(),
+                producer.getProducerType(),
+                producer.getMunicipality(),
+                producer.getDepartment(),
+                producer.getCommunityName(),
+                producer.getMainProduct(),
+                producer.getBio());
     }
 }

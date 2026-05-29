@@ -8,6 +8,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 public record PublicTraceResponse(
+        Long lotId,
+        Long producerId,
         String lotCode,
         String qrCodeValue,
         LotStatus status,

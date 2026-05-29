@@ -41,7 +41,7 @@ const LotDetail = () => {
   if (!lot) return null
 
   const [label, color] = STATUS[lot.status] || [lot.status, 'gray']
-  const qrUrl = lot.qrCodeValue ? publicTraceApi.publicUrl(lot.qrCodeValue) : null
+  const qrUrl = lot.qrCodeValue ? publicTraceApi.productPublicUrl(lot.qrCodeValue) : null
 
   const FIELDS = [
     ['Producto', lot.productName], ['Categoría', lot.productCategory],

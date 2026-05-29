@@ -38,6 +38,8 @@ import TourismLeads from './pages/dashboards/tourism/sections/TourismLeads.jsx'
 import TourismReports from './pages/dashboards/tourism/sections/TourismReports.jsx'
 import TourismFinance from './pages/dashboards/tourism/sections/TourismFinance.jsx'
 import RegisterFlow from './pages/register/RegisterFlow.jsx'
+import PublicTracePage from './pages/public/PublicTracePage.jsx'
+import PublicExperiencePage from './pages/public/PublicExperiencePage.jsx'
 
 const router = createBrowserRouter([
   {
@@ -47,6 +49,14 @@ const router = createBrowserRouter([
   {
     path: '/register',
     element: <RegisterFlow />,
+  },
+  {
+    path: '/trace/:qrSlug',
+    element: <PublicTracePage />,
+  },
+  {
+    path: '/experiencia/:slug',
+    element: <PublicExperiencePage />,
   },
   {
     path: '/',

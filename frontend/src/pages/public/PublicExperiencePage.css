@@ -1,0 +1,49 @@
+.pexp {
+  --green-900: #0d1f0f;
+  --green-800: #1b3a1f;
+  --cream: #faf7f0;
+  --gray-200: #e5e7eb;
+  --gray-500: #6b7280;
+  --gray-900: #111827;
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--cream);
+  min-height: 100vh;
+  color: var(--gray-900);
+}
+
+.pexp-loading, .pexp-error {
+  min-height: 50vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 24px; text-align: center; color: var(--gray-500);
+}
+
+.pexp-hero {
+  background: linear-gradient(135deg, var(--green-900), var(--green-800));
+  color: #fff; padding: 40px 24px 36px;
+}
+.pexp-logo { height: 26px; filter: brightness(0) invert(1); margin-bottom: 16px; }
+.pexp-badge {
+  display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600;
+  background: rgba(255,255,255,.12); padding: 5px 12px; border-radius: 20px; margin-bottom: 12px;
+}
+.pexp-hero h1 { font-size: clamp(24px, 4vw, 34px); font-weight: 700; max-width: 720px; }
+.pexp-loc, .pexp-op { font-size: 14px; opacity: .9; margin-top: 8px; display: flex; align-items: center; gap: 6px; }
+.pexp-desc { margin-top: 14px; max-width: 640px; line-height: 1.6; font-size: 14px; opacity: .92; }
+
+.pexp-main { max-width: 720px; margin: 0 auto; padding: 32px 24px 48px; }
+.pexp-main h2 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+.pexp-hint { font-size: 13px; color: var(--gray-500); margin-bottom: 20px; line-height: 1.5; }
+.pexp-empty { color: var(--gray-500); font-size: 14px; }
+
+.pexp-lots { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.pexp-lots li {
+  background: #fff; border: 1px solid var(--gray-200); border-radius: 14px; padding: 16px 18px;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+}
+.pexp-lots strong { display: block; font-size: 15px; }
+.pexp-lots span { display: block; font-size: 12px; color: var(--gray-500); margin-top: 2px; }
+.pexp-code { font-family: ui-monospace, monospace; font-size: 11px !important; }
+.pexp-link {
+  display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600;
+  color: var(--green-800); text-decoration: none; white-space: nowrap;
+}
+.pexp-link:hover { text-decoration: underline; }

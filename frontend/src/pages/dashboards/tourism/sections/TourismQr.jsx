@@ -1,7 +1,7 @@
 import { QRCodeCanvas } from 'qrcode.react'
 import { QrCode, Download, ExternalLink } from 'lucide-react'
 import { useTourismData } from '../useTourismData'
-import { publicTraceApi } from '../../../../shared/api/publicTraceApi'
+import { publicExperienceApi } from '../../../../shared/api/publicExperienceApi'
 import './sections.css'
 
 const TourismQr = () => {
@@ -39,7 +39,7 @@ const TourismQr = () => {
       {!loading && withQr.length > 0 && (
         <div className="tsec-grid">
           {withQr.map(e => {
-            const url = publicTraceApi.publicUrl(e.qrSlug)
+            const url = publicExperienceApi.experiencePublicUrl(e.qrSlug)
             return (
               <div key={e.id} className="tsec-qr-tile">
                 <div className="tsec-qr-canvas">

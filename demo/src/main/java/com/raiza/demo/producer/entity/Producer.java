@@ -50,4 +50,7 @@ public class Producer extends BaseEntity {
     // Conocimiento sobre certificaciones: HAS / NONE / UNKNOWN
     @Column(name = "certification_awareness", length = 20)
     private String certificationAwareness;
+
+    @Column(columnDefinition = "text")
+    private String bio;
 }

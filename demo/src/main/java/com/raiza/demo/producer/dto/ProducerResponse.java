@@ -15,6 +15,7 @@ public record ProducerResponse(
         String municipality,
         String department,
         String communityName,
+        String bio,
         LocalDateTime createdAt
 ) {
 }

@@ -7,6 +7,7 @@ import com.raiza.demo.lead.service.PurchaseLeadService;
 import com.raiza.demo.lot.entity.ProductLot;
 import com.raiza.demo.lot.service.ProductLotService;
 import com.raiza.demo.publicview.dto.PublicExperienceResponse;
+import com.raiza.demo.publicview.dto.PublicProducerResponse;
 import com.raiza.demo.publicview.dto.PublicTraceResponse;
 import com.raiza.demo.publicview.service.PublicTraceService;
 import com.raiza.demo.shared.enums.ActorType;
@@ -59,9 +60,33 @@ public class PublicTraceController {
             @PathVariable String qrSlug,
             @RequestBody @Valid CreatePublicLeadRequest req,
             UriComponentsBuilder uriBuilder) {
-        LeadResponse created = leadService.createPublicLead(req);
+        ProductLot lot = lotService.getByQrCodeValue(qrSlug);
+        CreatePublicLeadRequest enriched = new CreatePublicLeadRequest(
+                lot.getId(),
+                req.buyerType(),
+                req.buyerName(),
+                req.companyName(),
+                req.country(),
+                req.phone(),
+                req.email(),
+                req.preferredLanguage(),
+                req.requestedQuantity(),
+                req.unitOfMeasure(),
+                req.destinationCountry(),
+                req.message(),
+                req.sourceType() != null ? req.sourceType() : "PUBLIC_QR",
+                req.sourceReference() != null ? req.sourceReference() : qrSlug);
+        LeadResponse created = leadService.createPublicLead(enriched);
         URI location = uriBuilder.path("/api/v1/leads/{id}").buildAndExpand(created.id()).toUri();
         return ResponseEntity.created(location).body(ApiResponse.created(created));
+    }
+
+    // ── Perfil público del productor ──────────────────────────────────────
+
+    @GetMapping("/producers/{id}")
+    public ResponseEntity<ApiResponse<PublicProducerResponse>> getPublicProducer(
+            @PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponse.ok(publicTraceService.getProducerById(id)));
     }
 
     // ── Vista pública de experiencia turística ────────────────────────────

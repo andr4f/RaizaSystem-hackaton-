@@ -43,7 +43,7 @@ const QrLabels = () => {
         <div className="sec-grid">
           {withQr.map(lot => {
             const slug = lot.qrCodeValue
-            const url = publicTraceApi.publicUrl(slug)
+            const url = publicTraceApi.productPublicUrl(slug)
             return (
               <div key={lot.id} className="qr-tile">
                 <div className="qr-canvas-wrap">
